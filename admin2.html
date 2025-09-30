@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - NYF Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --primary-purple: #9f7aea;
+            --primary-blue: #6366f1;
+            --accent-red: #f87171;
+            --accent-yellow: #fbbf24;
+            --text-dark: #e2e8f0;
+            --text-light: #a0aec0;
+            --bg-light: #1a202c;
+            --bg-secondary: #2d3748;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+            --danger-color: #e53e3e;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1.5rem;
+        }
+        @media (min-width: 1024px) { .container { max-width: 1280px; } }
+        
+        /* Login Page Styles */
+        #login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .login-box {
+            background-color: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .login-box h1 {
+            text-align: center;
+            font-size: 1.875rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block; font-weight: 500;
+            margin-bottom: 0.5rem; color: var(--text-light);
+        }
+        .form-group input {
+            width: 100%; padding: 0.75rem 1rem;
+            border-radius: 0.375rem; border: 1px solid var(--border-color);
+            background-color: var(--bg-light); color: var(--text-dark);
+            box-sizing: border-box; transition: all 0.3s ease;
+        }
+        .form-group input:focus {
+            outline: none; border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.3);
+        }
+        .submit-btn {
+            width: 100%; padding: 0.75rem; border: none; border-radius: 0.375rem;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-blue));
+            color: white; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        .submit-btn:hover { opacity: 0.9; }
+        #login-error { color: var(--danger-color); text-align: center; margin-top: 1rem; display: none; }
+
+        /* Dashboard Styles */
+        #dashboard-container { display: none; }
+        .header {
+            background-color: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .header h1 { margin: 0; font-size: 1.5rem; }
+        #logout-button {
+            background-color: var(--danger-color); color: white;
+            border: none; padding: 0.5rem 1rem; border-radius: 0.375rem;
+            cursor: pointer; transition: background-color 0.3s;
+        }
+        #logout-button:hover { background-color: #c53030; }
+
+        .tabs-container {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .tabs { 
+            display: flex; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .tab-button {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        .tab-button.active {
+            color: var(--primary-purple);
+            border-bottom: 3px solid var(--primary-purple);
+        }
+        .tab-content { display: none; padding-top: 2rem; }
+        .tab-content.active { display: block; }
+        
+        .section-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        .section-header h2 { margin: 0; }
+        .pdf-btn {
+            background-color: var(--success-color); color: white;
+            border: none; padding: 0.6rem 1.2rem; border-radius: 0.375rem;
+            cursor: pointer; transition: background-color 0.3s; font-weight: 500;
+        }
+        .pdf-btn:hover { background-color: #38a169; }
+
+        /* Card Styles for Players/Teams */
+        .card-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        }
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .card h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; font-size: 1.25rem; }
+        .card p { margin: 0.5rem 0; color: var(--text-light); }
+        .card p strong { color: var(--text-dark); }
+        .card-actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .card-actions .btn {
+            border: none; padding: 0.5rem 1rem; border-radius: 0.375rem;
+            cursor: pointer; font-weight: 600; transition: opacity 0.3s;
+        }
+        .card-actions .btn:hover { opacity: 0.8; }
+        .btn-approve { background-color: var(--success-color); color: white; }
+        .btn-reject { background-color: var(--danger-color); color: white; }
+        .btn-proof { background-color: var(--accent-yellow); color: #1a202c; }
+        .btn-delete { background-color: var(--danger-color); color: white; }
+
+        /* Announcement Form */
+        .form-container {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        .form-container h2 { margin-top: 0; }
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+        .form-container textarea {
+            width: 100%; height: 100px;
+            padding: 0.75rem 1rem; border-radius: 0.375rem; border: 1px solid var(--border-color);
+            background-color: var(--bg-light); color: var(--text-dark);
+            box-sizing: border-box; resize: vertical; margin-bottom: 1rem;
+        }
+        
+        .placeholder { color: var(--text-light); text-align: center; padding: 2rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Login Container -->
+    <div id="login-container">
+        <div class="login-box">
+            <h1>Admin Panel Login</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="admin-email">Email</label>
+                    <input type="email" id="admin-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" required>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+            <p id="login-error"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div id="dashboard-container">
+        <header class="header">
+            <h1>NYF Admin Dashboard</h1>
+            <button id="logout-button">Logout</button>
+        </header>
+
+        <main class="container">
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="pending-players">Pending Players</button>
+                    <button class="tab-button" data-tab="approved-players">Approved Players</button>
+                    <button class="tab-button" data-tab="pending-teams">Pending Teams</button>
+                    <button class="tab-button" data-tab="approved-teams">Approved Teams</button>
+                    <button class="tab-button" data-tab="announcements">Announcements</button>
+                </div>
+            </div>
+
+            <!-- Pending Players Tab -->
+            <div id="pending-players" class="tab-content active">
+                <div class="section-header"><h2>Pending Player Approvals</h2></div>
+                <div id="pending-players-grid" class="card-grid"></div>
+            </div>
+            
+            <!-- Approved Players Tab -->
+            <div id="approved-players" class="tab-content">
+                 <div class="section-header">
+                    <h2>Approved Player List</h2>
+                    <button class="pdf-btn" id="generate-players-pdf">Download Approved Players PDF</button>
+                </div>
+                <div id="approved-players-grid" class="card-grid"></div>
+            </div>
+
+            <!-- Pending Teams Tab -->
+            <div id="pending-teams" class="tab-content">
+                <div class="section-header"><h2>Pending Team Approvals</h2></div>
+                <div id="pending-teams-grid" class="card-grid"></div>
+            </div>
+
+            <!-- Approved Teams Tab -->
+            <div id="approved-teams" class="tab-content">
+                <div class="section-header">
+                    <h2>Approved Teams List</h2>
+                    <button class="pdf-btn" id="generate-teams-pdf">Download Approved Teams PDF</button>
+                </div>
+                <div id="approved-teams-grid" class="card-grid"></div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="announcements" class="tab-content">
+                <div class="form-container">
+                    <h2>Create New Announcement</h2>
+                    <form id="announcement-form">
+                        <input type="text" id="announcement-headline" placeholder="Announcement Headline" required>
+                        <textarea id="announcement-text" placeholder="Write the full announcement description here..." required></textarea>
+                        <button type="submit" class="submit-btn">Post Announcement</button>
+                    </form>
+                </div>
+                 <div class="section-header"><h2>Current Announcements</h2></div>
+                <div id="announcements-grid" class="card-grid"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="firebaseconfig.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI Elements
+        const loginContainer = document.getElementById('login-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutButton = document.getElementById('logout-button');
+
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loginContainer.style.display = 'none';
+                dashboardContainer.style.display = 'block';
+                loadDashboardData();
+            } else {
+                loginContainer.style.display = 'flex';
+                dashboardContainer.style.display = 'none';
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            signInWithEmailAndPassword(auth, email, password)
+                .catch(error => {
+                    loginError.textContent = 'Invalid email or password.';
+                    loginError.style.display = 'block';
+                });
+        });
+
+        logoutButton.addEventListener('click', () => signOut(auth));
+        
+        // --- DATA RENDERING FUNCTIONS ---
+        const renderCards = (gridElement, snapshot, cardHTMLGenerator) => {
+            if (snapshot.empty) {
+                gridElement.innerHTML = `<p class="placeholder col-span-full">${gridElement.dataset.placeholder}</p>`;
+                return;
+            }
+            gridElement.innerHTML = '';
+            snapshot.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = cardHTMLGenerator(doc.id, doc.data());
+                gridElement.appendChild(card);
+            });
+        };
+
+        // --- DASHBOARD DATA LOADING ---
+        function loadDashboardData() {
+            const grids = {
+                pendingPlayers: document.getElementById('pending-players-grid'),
+                approvedPlayers: document.getElementById('approved-players-grid'),
+                pendingTeams: document.getElementById('pending-teams-grid'),
+                approvedTeams: document.getElementById('approved-teams-grid'),
+                announcements: document.getElementById('announcements-grid')
+            };
+            
+            grids.pendingPlayers.dataset.placeholder = "No pending player registrations.";
+            grids.approvedPlayers.dataset.placeholder = "No approved players yet.";
+            grids.pendingTeams.dataset.placeholder = "No pending team registrations.";
+            grids.approvedTeams.dataset.placeholder = "No approved teams yet.";
+            grids.announcements.dataset.placeholder = "No announcements posted.";
+
+            // Players
+            onSnapshot(collection(db, 'pending_players'), snap => renderCards(grids.pendingPlayers, snap, (id, player) => `
+                <h3>${player.fullName}</h3>
+                <p><strong>Phone:</strong> ${player.phone}</p><p><strong>Email:</strong> ${player.email}</p>
+                <p><strong>Age:</strong> ${player.age}</p><p><strong>Role:</strong> ${player.role}</p>
+                <div class="card-actions">
+                    <button class="btn btn-proof" data-url="${player.proofUrl}">View Proof</button>
+                    <button class="btn btn-approve" data-type="player" data-id="${id}">Approve</button>
+                    <button class="btn btn-reject" data-type="player" data-id="${id}">Reject</button>
+                </div>`));
+            
+            onSnapshot(collection(db, 'players'), snap => renderCards(grids.approvedPlayers, snap, (id, player) => `
+                <h3>${player.fullName}</h3><p><strong>Phone:</strong> ${player.phone}</p><p><strong>Email:</strong> ${player.email}</p><p><strong>Role:</strong> ${player.role}</p>
+                <div class="card-actions"><button class="btn btn-delete" data-collection="players" data-id="${id}">Delete</button></div>`));
+
+            // Teams
+            onSnapshot(collection(db, 'pending_teams'), snap => renderCards(grids.pendingTeams, snap, (id, team) => `
+                <h3>${team.teamName}</h3>
+                <p><strong>Captain:</strong> ${team.captainName}</p><p><strong>Phone:</strong> ${team.captainPhone}</p><p><strong>City:</strong> ${team.city}</p>
+                <div class="card-actions">
+                    <button class="btn btn-proof" data-url="${team.proofUrl}">View Proof</button>
+                    <button class="btn btn-approve" data-type="team" data-id="${id}">Approve</button>
+                    <button class="btn btn-reject" data-type="team" data-id="${id}">Reject</button>
+                </div>`));
+
+            onSnapshot(collection(db, 'approved_teams'), snap => renderCards(grids.approvedTeams, snap, (id, team) => `
+                <h3>${team.teamName}</h3><p><strong>Captain:</strong> ${team.captainName}</p><p><strong>Phone:</strong> ${team.captainPhone}</p>
+                <div class="card-actions"><button class="btn btn-delete" data-collection="approved_teams" data-id="${id}">Delete</button></div>`));
+
+            // Announcements
+            onSnapshot(query(collection(db, 'announcements'), orderBy('createdAt', 'desc')), snap => renderCards(grids.announcements, snap, (id, ann) => `
+                <h3>${ann.headline}</h3><p>${ann.text}</p>
+                <div class="card-actions"><button class="btn btn-delete" data-collection="announcements" data-id="${id}">Delete</button></div>`));
+        }
+        
+        // --- DYNAMIC BUTTON ACTIONS ---
+        document.addEventListener('click', async (e) => {
+            const target = e.target;
+            
+            // Approval / Rejection Logic
+            if (target.matches('.btn-approve') || target.matches('.btn-reject')) {
+                const type = target.dataset.type;
+                const id = target.dataset.id;
+                const pendingCollection = `pending_${type}s`;
+                
+                if (target.matches('.btn-approve')) {
+                    const approvedCollection = (type === 'player') ? 'players' : 'approved_teams';
+                    const docRef = doc(db, pendingCollection, id);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        await setDoc(doc(db, approvedCollection, id), docSnap.data());
+                        await deleteDoc(docRef);
+                        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} approved!`);
+                    }
+                } else { // Reject
+                    if (confirm(`Are you sure you want to reject this ${type}?`)) {
+                        await deleteDoc(doc(db, pendingCollection, id));
+                        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} rejected.`);
+                    }
+                }
+            }
+
+            // Generic Delete Button
+            if (target.matches('.btn-delete')) {
+                const collectionName = target.dataset.collection;
+                const id = target.dataset.id;
+                if(confirm(`Are you sure you want to delete this item from ${collectionName}?`)) {
+                    await deleteDoc(doc(db, collectionName, id));
+                    alert('Item deleted.');
+                }
+            }
+            
+            // View Proof
+            if (target.matches('.btn-proof')) {
+                window.open(target.dataset.url, '_blank');
+            }
+        });
+        
+        // --- TABS ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+
+        // --- ANNOUNCEMENTS FORM ---
+        const announcementForm = document.getElementById('announcement-form');
+        announcementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const headline = document.getElementById('announcement-headline').value;
+            const text = document.getElementById('announcement-text').value;
+            await addDoc(collection(db, 'announcements'), {
+                headline,
+                text,
+                createdAt: serverTimestamp()
+            });
+            announcementForm.reset();
+            alert('Announcement posted!');
+        });
+
+        // --- PDF GENERATION ---
+        const { jsPDF } = window.jspdf;
+        const generatePdf = (buttonId, gridId, title, headers, rowGenerator) => {
+            document.getElementById(buttonId).addEventListener('click', () => {
+                const grid = document.getElementById(gridId);
+                if (grid.querySelector('.placeholder')) {
+                    alert(`No data available to generate PDF.`);
+                    return;
+                }
+                const docPdf = new jsPDF();
+                docPdf.text(title, 14, 15);
+                const tableData = Array.from(grid.querySelectorAll('.card')).map(rowGenerator);
+                docPdf.autoTable({ head: [headers], body: tableData, startY: 25, theme: 'grid' });
+                docPdf.save(`${title.toLowerCase().replace(/\s/g, '-')}.pdf`);
+            });
+        };
+
+        generatePdf('generate-players-pdf', 'approved-players-grid', 'Approved Players List', 
+            ['Full Name', 'Phone', 'Email', 'Playing Role'], 
+            card => [
+                card.querySelector('h3').textContent,
+                card.querySelector('p:nth-of-type(1)').textContent.replace('Phone: ', ''),
+                card.querySelector('p:nth-of-type(2)').textContent.replace('Email: ', ''),
+                card.querySelector('p:nth-of-type(3)').textContent.replace('Role: ', '')
+            ]);
+        
+        generatePdf('generate-teams-pdf', 'approved-teams-grid', 'Approved Teams List',
+            ['Team Name', 'Captain Name', 'Captain Phone'],
+            card => [
+                card.querySelector('h3').textContent,
+                card.querySelector('p:nth-of-type(1)').textContent.replace('Captain: ', ''),
+                card.querySelector('p:nth-of-type(2)').textContent.replace('Phone: ', '')
+            ]);
+
+    </script>
+</body>
+</html>
+
