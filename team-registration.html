@@ -331,75 +331,60 @@
     <script src="firebaseconfig.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const form = document.getElementById('team-registration-form');
-        const submitButton = document.getElementById('submit-button');
-        const messageBox = document.getElementById('message-box');
-
-        form.addEventListener('submit', async (e) => {
+// ... existing code ... -->
+        registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const teamName = document.getElementById('teamName').value;
-            const captainName = document.getElementById('captainName').value;
-            const captainPhone = document.getElementById('captainPhone').value;
-            const captainEmail = document.getElementById('captainEmail').value;
-            const city = document.getElementById('city').value;
-            const paymentProofFile = document.getElementById('paymentProof').files[0];
 
-            if (!paymentProofFile) {
-                showMessage('Please upload a payment proof screenshot.', 'error');
+            const teamName = document.getElementById('team-name').value;
+            const captainName = document.getElementById('captain-name').value;
+// ... existing code ... -->
+            const proofFile = document.getElementById('payment-proof').files[0];
+
+            if (!proofFile) {
+                alert('Please upload a payment proof screenshot.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Registration';
                 return;
             }
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
-            
             try {
-                // 1. Upload payment proof to Firebase Storage
-                const storageRef = ref(storage, `team_payment_proofs/${Date.now()}_${paymentProofFile.name}`);
-                const snapshot = await uploadBytes(storageRef, paymentProofFile);
-                
-                // 2. Get the download URL of the uploaded image
+                // 1. Upload proof to Firebase Storage
+                const proofRef = ref(storage, `team_payment_proofs/${Date.now()}_${proofFile.name}`);
+                const snapshot = await uploadBytes(proofRef, proofFile);
                 const proofUrl = await getDownloadURL(snapshot.ref);
 
-                // 3. Save team data to Firestore
-                await addDoc(collection(db, "teams"), {
+                // 2. Save team data to Firestore's "pending_teams" collection
+                await addDoc(collection(db, 'pending_teams'), {
                     teamName,
                     captainName,
                     captainPhone,
-                    captainEmail,
                     city,
-                    proofUrl,
-                    registeredAt: serverTimestamp()
+                    proofUrl
                 });
 
-                showMessage('Team registration successful! We will get in touch with you shortly.', 'success');
-                form.reset();
+                // 3. Show success message
+                formContainer.innerHTML = `
+                    <div class="success-message">
+                        <h3>Registration Submitted!</h3>
+                        <p>Your team's registration has been received. The tournament committee will review it shortly.</p>
+                        <a href="index.html" class="home-link">Back to Home</a>
+                    </div>
+                `;
 
             } catch (error) {
-                console.error("Error submitting team registration: ", error);
-                showMessage('An error occurred. Please try again.', 'error');
-            } finally {
+                console.error("Error submitting registration: ", error);
+                alert('An error occurred. Please check the console and try again.');
                 submitButton.disabled = false;
-                submitButton.textContent = 'Submit Team Registration';
+                submitButton.textContent = 'Submit Registration';
             }
         });
-
-        function showMessage(message, type) {
-            messageBox.textContent = message;
-            messageBox.className = type; // 'success' or 'error'
-            messageBox.style.display = 'block';
-
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 5000);
-        }
     </script>
 </body>
 </html>
