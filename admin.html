@@ -422,7 +422,7 @@
         // --- DATA RENDERING FUNCTIONS ---
         const renderTableRows = (tbodyElement, snapshot, rowHTMLGenerator) => {
             if (snapshot.empty) {
-                const colCount = tbodyElement.closest('table').querySelector('thead th').length;
+                const colCount = tbodyElement.closest('table').querySelector('thead tr').children.length;
                 tbodyElement.innerHTML = `<tr><td colspan="${colCount}" class="placeholder">${tbodyElement.dataset.placeholder}</td></tr>`;
                 return;
             }
@@ -511,7 +511,76 @@
                 <div class="card-actions"><button class="btn btn-delete" data-collection="announcements" data-id="${id}">Delete</button></div>`));
         }
         
-        // Button actions and Tabs logic remain the same
+        // --- EVENT DELEGATION FOR DYNAMIC BUTTONS ---
+        document.addEventListener('click', async (e) => {
+            const target = e.target;
+            
+            // Approval / Rejection Logic
+            if (target.matches('.btn-approve') || target.matches('.btn-reject')) {
+                const type = target.dataset.type;
+                const id = target.dataset.id;
+                const pendingCollection = `pending_${type}s`;
+                
+                if (target.matches('.btn-approve')) {
+                    const approvedCollection = (type === 'player') ? 'players' : 'approved_teams';
+                    const docRef = doc(db, pendingCollection, id);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        await setDoc(doc(db, approvedCollection, id), docSnap.data());
+                        await deleteDoc(docRef);
+                        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} approved!`);
+                    }
+                } else { // Reject
+                    if (confirm(`Are you sure you want to reject this ${type}?`)) {
+                        await deleteDoc(doc(db, pendingCollection, id));
+                        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} rejected.`);
+                    }
+                }
+            }
+
+            // Generic Delete Button
+            if (target.matches('.btn-delete')) {
+                const collectionName = target.dataset.collection;
+                const id = target.dataset.id;
+                if(confirm(`Are you sure you want to delete this item from ${collectionName}?`)) {
+                    await deleteDoc(doc(db, collectionName, id));
+                    alert('Item deleted.');
+                }
+            }
+            
+            // View Proof
+            if (target.matches('.btn-proof')) {
+                window.open(target.dataset.url, '_blank');
+            }
+        });
+        
+        // --- TABS ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+
+        // --- ANNOUNCEMENTS FORM ---
+        const announcementForm = document.getElementById('announcement-form');
+        announcementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const headline = document.getElementById('announcement-headline').value;
+            const text = document.getElementById('announcement-text').value;
+            await addDoc(collection(db, 'announcements'), {
+                headline,
+                text,
+                createdAt: serverTimestamp()
+            });
+            announcementForm.reset();
+            alert('Announcement posted!');
+        });
         
         // --- PDF GENERATION ---
         const { jsPDF } = window.jspdf;
