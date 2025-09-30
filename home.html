@@ -3,431 +3,468 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Cricket Tournament</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>NYF Night Cricket Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* Light gray background */
+        /* Base Styles */
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            margin: 0;
         }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
         }
-        ::-webkit-scrollbar-track {
-            background: #e0e0e0;
-            border-radius: 10px;
+        @media (min-width: 640px) { .container { max-width: 640px; } }
+        @media (min-width: 768px) { .container { max-width: 768px; } }
+        @media (min-width: 1024px) { .container { max-width: 1024px; } }
+        @media (min-width: 1280px) { .container { max-width: 1280px; } }
+
+        /* Header */
+        .header {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .nav-brand {
+            font-size: 1.875rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            color: white;
         }
+        .nav-links {
+            display: none; /* Hidden on mobile */
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+        }
+        @media (min-width: 768px) { .nav-links { display: flex; } }
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s ease;
+        }
+        .nav-links a.active {
+            font-weight: 600;
+            border-bottom: 2px solid white;
+            padding-bottom: 0.25rem;
+        }
+        .nav-links a:not(.active):hover { color: #facc15; }
+        .nav-links .admin-link {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+        }
+        .nav-links .admin-link:hover { background-color: rgba(255, 255, 255, 0.3); }
+
+        /* Mobile Menu */
+        #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
+        @media (min-width: 768px) { #mobile-menu-button { display: none; } }
+        #mobile-menu {
+            display: none;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 1rem;
+        }
+        #mobile-menu a { display: block; padding-top: 0.5rem; padding-bottom: 0.5rem; text-decoration: none; color: white; }
+        #mobile-menu a.admin-link { background-color: rgba(255, 255, 255, 0.2); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; }
+
+        /* Main Content */
+        main { padding-top: 3rem; padding-bottom: 3rem; }
+        @media (min-width: 768px) { main { padding-top: 5rem; padding-bottom: 5rem; } }
+        .hero-section { text-align: center; }
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            background: linear-gradient(to right, #a855f7, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        @media (min-width: 768px) { .hero-title { font-size: 4.5rem; } }
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: #4b5563;
+            max-width: 48rem;
+            margin: 0 auto 2.5rem auto;
+        }
+        @media (min-width: 768px) { .hero-subtitle { font-size: 1.25rem; } }
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        @media (min-width: 768px) { .hero-buttons { gap: 1.5rem; } }
+        
+        /* Buttons */
+        .btn { 
+            display: inline-block;
+            font-weight: 700; 
+            padding: 0.75rem 2rem; 
+            border-radius: 0.375rem; 
+            transition: all 0.3s ease; 
+            text-decoration: none;
+            transform-origin: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn-register { 
+            background-color: #dc2626; 
+            color: white; 
+        }
+        .btn-register:hover { background-color: #b91c1c; }
+        .btn-team {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .btn-team:hover { background-color: #d97706; }
+
+        /* Image Section */
+        .image-container {
+            margin-top: 4rem;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        @media (min-width: 768px) { .image-container { margin-top: 6rem; padding: 1.5rem; } }
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            object-fit: cover;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-top: 4rem;
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #374151;
+        }
+        
+        /* Announcements Section */
+        #announcements {
+            max-width: 56rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .announcement-box {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+        .announcement-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .announcement-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .announcement-item:first-child {
+            padding-top: 0;
+        }
+        .announcement-item p {
+            margin: 0;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        .announcement-date {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        /* Features/Icons Section */
+        .features-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+        .feature-card {
+            background-color: white;
+            padding: 2.5rem 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        .feature-icon {
+            margin: 0 auto 1.5rem auto;
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            border-radius: 50%;
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        .feature-description {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #111827;
+            color: #9ca3af;
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+            margin-top: 4rem;
+        }
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .footer-brand {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-links a {
+            text-decoration: none;
+            color: #9ca3af;
+            transition: color 0.3s ease;
+        }
+        .footer-links a:hover { color: white; }
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .social-links a {
+            color: #9ca3af;
+            transition: color 0.3s ease;
+        }
+        .social-links a:hover { color: white; }
+        .copyright {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            border-top: 1px solid #374151;
+            padding-top: 2rem;
+            width: 100%;
+        }
+
     </style>
 </head>
-<body class="text-gray-800">
+<body>
 
-    <!-- Header Section -->
-    <header class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg p-4 md:p-6 rounded-b-xl">
-        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
-            <h1 class="text-3xl md:text-4xl font-bold mb-2 md:mb-0">
-                <span class="block text-yellow-300">Cricket Mania</span> Local Tournament
-            </h1>
-            <!-- Navigation -->
-            <nav class="mt-3 md:mt-0">
-                <ul class="flex flex-wrap justify-center space-x-4 md:space-x-6">
-                    <li><a href="#home" class="hover:text-yellow-300 transition duration-300 text-lg font-medium">Home</a></li>
-                    <li><a href="#teams" class="hover:text-yellow-300 transition duration-300 text-lg font-medium">Teams</a></li>
-                    <li><a href="#schedule" class="hover:text-yellow-300 transition duration-300 text-lg font-medium">Schedule</a></li>
-                    <li><a href="#results" class="hover:text-yellow-300 transition duration-300 text-lg font-medium">Results</a></li>
-                    <li><a href="#standings" class="hover:text-yellow-300 transition duration-300 text-lg font-medium">Standings</a></li>
-                    <li><a href="admin.html" class="hover:text-yellow-300 transition duration-300 text-lg font-medium">Admin Panel</a></li>
-                </ul>
-            </nav>
+    <!-- Header -->
+    <header class="header">
+        <nav class="container nav">
+            <a href="index.html" class="nav-brand">NYF CRICKET</a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="player-registration.html">Player Registration</a>
+                <a href="team-registration.html">Team Registration</a>
+                <a href="admin.html" class="admin-link">Admin Panel</a>
+            </div>
+            <button id="mobile-menu-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="player-registration.html">Player Registration</a>
+            <a href="team-registration.html">Team Registration</a>
+            <a href="admin.html" class="admin-link">Admin Panel</a>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="relative bg-cover bg-center h-96 flex items-center justify-center text-white text-center rounded-xl mx-4 mt-6 shadow-xl"
-        style="background-image: url('https://placehold.co/1200x500/0f8546/ffffff?text=Cricket+Ground+Background');">
-        <div class="absolute inset-0 bg-black opacity-60 rounded-xl"></div>
-        <div class="relative z-10 p-4">
-            <h2 class="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">Get Ready for the Action!</h2>
-            <p class="text-lg md:text-2xl mb-6">Witness the thrill of local cricket. Join us!</p>
-            <a href="#schedule" class="bg-yellow-400 hover:bg-yellow-500 text-green-900 font-bold py-3 px-8 rounded-full shadow-lg transform transition duration-300 hover:scale-105 inline-block">
-                View Schedule
-            </a>
-        </div>
-    </section>
-
-    <!-- About Tournament Section -->
-    <section class="container mx-auto my-10 p-6 bg-white rounded-xl shadow-lg">
-        <h2 class="text-3xl font-bold text-center text-green-700 mb-6">About the Tournament</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-                <p class="text-lg leading-relaxed mb-4">
-                    The "Cricket Mania Local Tournament" is an exciting event bringing together the best local cricket talent. Our aim is to foster community spirit, promote healthy competition, and celebrate the love for cricket.
+    <main>
+        <div class="container">
+            <section class="hero-section">
+                <h1 class="hero-title">NYF Night Cricket Tournament</h1>
+                <p class="hero-subtitle">
+                    The biggest cricketing event is here. Register now and showcase your talent to the world. Let the games begin!
                 </p>
-                <p class="text-lg leading-relaxed">
-                    This year, we feature <span id="num-teams-about">0</span> dynamic teams battling it out for the coveted championship trophy. Expect thrilling matches, incredible catches, and unforgettable moments!
-                </p>
-            </div>
-            <div class="flex items-center justify-center">
-                <img src="https://placehold.co/400x250/0f8546/ffffff?text=Tournament+Trophy" alt="Tournament Trophy" class="rounded-lg shadow-md">
+                <div class="hero-buttons">
+                    <a href="player-registration.html" class="btn btn-register">Register as a Player</a>
+                    <a href="team-registration.html" class="btn btn-team">Register a Team</a>
+                </div>
+            </section>
+            <div class="image-container">
+                <img src="https://placehold.co/1200x500/8e2de2/ffffff?text=Let+the+Battle+Begin" alt="Cricket Championship">
             </div>
         </div>
-    </section>
+        
+        <!-- Announcements Section -->
+        <section class="section">
+            <div class="container" id="announcements">
+                 <h2 class="section-title">Latest Announcements</h2>
+                 <div class="announcement-box">
+                    <div id="announcements-list">
+                        <p style="color: #6b7280; text-align: center;">Loading announcements...</p>
+                    </div>
+                 </div>
+            </div>
+        </section>
 
-    <!-- Teams Section -->
-    <section id="teams" class="container mx-auto my-10 p-6 bg-white rounded-xl shadow-lg">
-        <h2 class="text-3xl font-bold text-center text-green-700 mb-8">Participating Teams</h2>
-        <div id="teams-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Team cards will be dynamically loaded here -->
-            <p class="col-span-full text-center text-gray-500" id="teams-loading-message">Loading teams...</p>
-        </div>
-    </section>
-
-    <!-- Schedule Section -->
-    <section id="schedule" class="container mx-auto my-10 p-6 bg-white rounded-xl shadow-lg">
-        <h2 class="text-3xl font-bold text-center text-green-700 mb-8">Match Schedule</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                <thead class="bg-green-700 text-white">
-                    <tr>
-                        <th class="py-3 px-4 text-left text-sm font-semibold rounded-tl-lg">Date</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">Time</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">Match</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">Venue</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold rounded-tr-lg">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="schedule-table-body">
-                    <!-- Schedule rows will be dynamically loaded here -->
-                    <tr><td colspan="5" class="py-4 text-center text-gray-500" id="schedule-loading-message">Loading schedule...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <!-- Results Section -->
-    <section id="results" class="container mx-auto my-10 p-6 bg-white rounded-xl shadow-lg">
-        <h2 class="text-3xl font-bold text-center text-green-700 mb-8">Latest Results</h2>
-        <div id="results-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Results cards will be dynamically loaded here -->
-            <p class="col-span-full text-center text-gray-500" id="results-loading-message">Loading results...</p>
-        </div>
-    </section>
-
-    <!-- Standings Section -->
-    <section id="standings" class="container mx-auto my-10 p-6 bg-white rounded-xl shadow-lg">
-        <h2 class="text-3xl font-bold text-center text-green-700 mb-8">Tournament Standings</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-                <thead class="bg-green-700 text-white">
-                    <tr>
-                        <th class="py-3 px-4 text-left text-sm font-semibold rounded-tl-lg">Pos</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">Team</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">P</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">W</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">L</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold">NRR</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold rounded-tr-lg">Pts</th>
-                    </tr>
-                </thead>
-                <tbody id="standings-table-body">
-                    <!-- Standings rows will be dynamically loaded here -->
-                    <tr><td colspan="7" class="py-4 text-center text-gray-500" id="standings-loading-message">Loading standings...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <!-- Footer Section -->
-    <footer class="bg-gray-800 text-white p-6 md:p-8 mt-10 rounded-t-xl">
-        <div class="container mx-auto text-center">
-            <p class="text-lg">&copy; 2025 Cricket Mania Tournament. All rights reserved.</p>
-            <div class="flex justify-center space-x-6 mt-4">
-                <a href="#" class="hover:text-green-400 transition duration-300">Privacy Policy</a>
-                <a href="#" class="hover:text-green-400 transition duration-300">Terms of Service</a>
-                <a href="#" class="hover:text-green-400 transition duration-300">Contact Us</a>
+        <!-- Features Section -->
+        <section class="section" style="background-color: #f9fafb;">
+            <div class="container">
+                <h2 class="section-title">Why Choose NYF Tournament?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        </div>
+                        <h3 class="feature-title">Easy Registration</h3>
+                        <p class="feature-description">A simple and streamlined process for both individual players and full teams to get registered in minutes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        </div>
+                        <h3 class="feature-title">Live Updates</h3>
+                        <p class="feature-description">Stay informed with real-time announcements about match schedules, results, and important news.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3 class="feature-title">Fair Play</h3>
+                        <p class="feature-description">Our tournament is managed by a professional admin panel ensuring fair selection and transparent processes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">NYF CRICKET</div>
+            <p>Experience the thrill of night cricket. Organized with passion.</p>
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="player-registration.html">Player Registration</a>
+                <a href="team-registration.html">Team Registration</a>
+                <a href="admin.html">Admin</a>
+            </div>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>
+                <a href="#" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a>
+                <a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 NYF Cricket Tournament. All Rights Reserved.
             </div>
         </div>
     </footer>
 
-    <!-- Firebase SDKs -->
+
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        });
+    </script>
+    
+    <!-- Firebase Libraries -->
+    <script src="firebaseconfig.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        // Global Firebase variables
-        let app;
-        let db;
-        let auth;
-        let allTeams = []; // Global array to store teams for dropdowns
-        let allMatches = []; // Global array to store matches
+        // Fetch and display announcements
+        const announcementsList = document.getElementById('announcements-list');
+        const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
 
-        // Canvas environment variables
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-
-        // Firestore collection paths
-        const publicDataPath = `artifacts/${appId}/public/data`;
-        const teamsCollectionRef = (db) => collection(db, `${publicDataPath}/teams`);
-        const matchesCollectionRef = (db) => collection(db, `${publicDataPath}/matches`);
-
-        // Public View Elements
-        const numTeamsAbout = document.getElementById('num-teams-about');
-        const teamsList = document.getElementById('teams-list');
-        const teamsLoadingMessage = document.getElementById('teams-loading-message');
-        const scheduleTableBody = document.getElementById('schedule-table-body');
-        const scheduleLoadingMessage = document.getElementById('schedule-loading-message');
-        const resultsList = document.getElementById('results-list');
-        const resultsLoadingMessage = document.getElementById('results-loading-message');
-        const standingsTableBody = document.getElementById('standings-table-body');
-        const standingsLoadingMessage = document.getElementById('standings-loading-message');
-
-        // --- Firebase Initialization and Auth ---
-        window.onload = async function() {
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Authenticate user (for public data access, anonymous sign-in is sufficient)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                // Start fetching and rendering data
-                setupRealtimeListeners();
-
-            } catch (error) {
-                console.error("Error initializing Firebase or authenticating:", error);
-                // Display a user-friendly error message if needed
-            }
-        };
-
-        // --- Real-time Data Listeners (Public View) ---
-        function setupRealtimeListeners() {
-            // Listen for Teams
-            onSnapshot(teamsCollectionRef(db), (snapshot) => {
-                allTeams = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderTeams(allTeams); // For public view
-                numTeamsAbout.textContent = allTeams.length; // Update about section
-                teamsLoadingMessage.classList.add('hidden');
-            }, (error) => {
-                console.error("Error fetching teams:", error);
-                teamsLoadingMessage.textContent = "Failed to load teams.";
-            });
-
-            // Listen for Matches
-            onSnapshot(matchesCollectionRef(db), (snapshot) => {
-                allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderSchedule(allMatches, allTeams); // For public view
-                renderResults(allMatches, allTeams); // For public view
-                renderStandings(allMatches, allTeams); // For public view
-                scheduleLoadingMessage.classList.add('hidden');
-                resultsLoadingMessage.classList.add('hidden');
-                standingsLoadingMessage.classList.add('hidden');
-            }, (error) => {
-                console.error("Error fetching matches:", error);
-                scheduleLoadingMessage.textContent = "Failed to load schedule.";
-                resultsLoadingMessage.textContent = "Failed to load results.";
-                standingsLoadingMessage.textContent = "Failed to load standings.";
-            });
-        }
-
-        // --- Render Functions for Public View ---
-        function renderTeams(teams) {
-            teamsList.innerHTML = '';
-            if (teams.length === 0) {
-                teamsList.innerHTML = '<p class="col-span-full text-center text-gray-500">No teams added yet.</p>';
+        onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                announcementsList.innerHTML = '<p style="color: #6b7280; text-align: center;">No announcements at the moment.</p>';
                 return;
             }
-            teams.forEach(team => {
-                const teamCard = `
-                    <div class="bg-gray-100 p-4 rounded-lg shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
-                        <img src="${team.logoUrl || `https://placehold.co/100x100/0f8546/ffffff?text=${team.name.split(' ').map(n => n[0]).join('')}`}" alt="${team.name} Logo" class="w-24 h-24 mx-auto mb-3 rounded-full border-4 border-green-500">
-                        <h3 class="text-xl font-semibold text-center text-green-800">${team.name}</h3>
-                        <p class="text-center text-gray-600 text-sm">Captain: ${team.captain}</p>
+            announcementsList.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const announcement = doc.data();
+                const date = announcement.createdAt.toDate().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                
+                const item = document.createElement('div');
+                item.className = 'announcement-item';
+
+                const iconHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#4a00e0; min-width: 24px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`;
+                
+                item.innerHTML = `
+                    ${iconHTML}
+                    <div>
+                        <p>${announcement.text}</p>
+                        <span class="announcement-date">${date}</span>
                     </div>
                 `;
-                teamsList.insertAdjacentHTML('beforeend', teamCard);
+                announcementsList.appendChild(item);
             });
-        }
-
-        function renderSchedule(matches, teams) {
-            scheduleTableBody.innerHTML = '';
-            const upcomingMatches = matches.filter(match => match.status === 'Upcoming' || match.status === 'Live')
-                                           .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
-
-            if (upcomingMatches.length === 0) {
-                scheduleTableBody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-gray-500">No upcoming matches scheduled.</td></tr>';
-                return;
-            }
-
-            upcomingMatches.forEach(match => {
-                const team1 = teams.find(t => t.id === match.team1Id);
-                const team2 = teams.find(t => t.id === match.team2Id);
-                const statusColor = match.status === 'Upcoming' ? 'text-blue-600' : 'text-orange-600';
-                const row = `
-                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="py-3 px-4">${match.date}</td>
-                        <td class="py-3 px-4">${match.time}</td>
-                        <td class="py-3 px-4 font-medium">${team1?.name || 'Unknown Team'} vs ${team2?.name || 'Unknown Team'}</td>
-                        <td class="py-3 px-4">${match.venue}</td>
-                        <td class="py-3 px-4 ${statusColor}">${match.status}</td>
-                    </tr>
-                `;
-                scheduleTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        function renderResults(matches, teams) {
-            resultsList.innerHTML = '';
-            const completedMatches = matches.filter(match => match.status === 'Completed')
-                                            .sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time)); // Latest first
-
-            if (completedMatches.length === 0) {
-                resultsList.innerHTML = '<p class="col-span-full text-center text-gray-500">No results available yet.</p>';
-                return;
-            }
-
-            completedMatches.forEach(match => {
-                const team1 = teams.find(t => t.id === match.team1Id);
-                const team2 = teams.find(t => t.id === match.team2Id);
-                const winnerTeam = teams.find(t => t.id === match.winner);
-                const resultCard = `
-                    <div class="bg-gray-100 p-5 rounded-lg shadow-md border-l-4 border-green-600">
-                        <p class="text-sm text-gray-500 mb-2">${match.date} - ${match.time}</p>
-                        <h3 class="text-xl font-semibold text-green-800 mb-3">${team1?.name || 'Unknown Team'} vs ${team2?.name || 'Unknown Team'}</h3>
-                        <p class="text-lg mb-2">${team1?.name || 'Unknown Team'}: ${match.team1Score || 'N/A'} (${match.team1Overs || 'N/A'} overs)</p>
-                        <p class="text-lg mb-3">${team2?.name || 'Unknown Team'}: ${match.team2Score || 'N/A'} (${match.team2Overs || 'N/A'} overs)</p>
-                        <p class="text-green-600 font-bold text-md">${winnerTeam?.name || 'Unknown'} won ${match.winMargin || 'by unknown margin'}</p>
-                    </div>
-                `;
-                resultsList.insertAdjacentHTML('beforeend', resultCard);
-            });
-        }
-
-        function renderStandings(matches, teams) {
-            standingsTableBody.innerHTML = '';
-            const standings = calculateStandings(teams, matches);
-
-            if (standings.length === 0) {
-                standingsTableBody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-gray-500">No standings data available yet.</td></tr>';
-                return;
-            }
-
-            standings.forEach(team => {
-                const row = `
-                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="py-3 px-4">${team.Pos}</td>
-                        <td class="py-3 px-4 font-medium">${team.name}</td>
-                        <td class="py-3 px-4">${team.P}</td>
-                        <td class="py-3 px-4">${team.W}</td>
-                        <td class="py-3 px-4">${team.L}</td>
-                        <td class="py-3 px-4">${team.NRR}</td>
-                        <td class="py-3 px-4 font-bold">${team.Pts}</td>
-                    </tr>
-                `;
-                standingsTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        // --- Standings Calculation Logic ---
-        function calculateStandings(teams, matches) {
-            const standingsMap = new Map();
-
-            // Initialize standings for all teams
-            teams.forEach(team => {
-                standingsMap.set(team.id, {
-                    id: team.id,
-                    name: team.name,
-                    P: 0, // Played
-                    W: 0, // Wins
-                    L: 0, // Losses
-                    NRR: 0, // Net Run Rate (simplified for this example)
-                    Pts: 0, // Points
-                    runsScored: 0,
-                    oversFaced: 0,
-                    runsConceded: 0,
-                    oversBowled: 0
-                });
-            });
-
-            matches.forEach(match => {
-                // Only process completed matches
-                if (match.status === 'Completed' && match.winner && match.team1Score && match.team2Score && match.team1Overs && match.team2Overs) {
-                    const team1Stats = standingsMap.get(match.team1Id);
-                    const team2Stats = standingsMap.get(match.team2Id);
-
-                    if (!team1Stats || !team2Stats) return; // Skip if team data is missing
-
-                    // Increment played matches
-                    team1Stats.P += 1;
-                    team2Stats.P += 1;
-
-                    // Update wins, losses, and points
-                    if (match.winner === match.team1Id) {
-                        team1Stats.W += 1;
-                        team1Stats.Pts += 2; // Assuming 2 points for a win
-                        team2Stats.L += 1;
-                    } else if (match.winner === match.team2Id) {
-                        team2Stats.W += 1;
-                        team2Stats.Pts += 2;
-                        team1Stats.L += 1;
-                    }
-
-                    // Parse scores and overs
-                    const parseScore = (scoreStr) => {
-                        const parts = scoreStr.split('/');
-                        return parseInt(parts[0]);
-                    };
-                    const team1Runs = parseScore(match.team1Score);
-                    const team2Runs = parseScore(match.team2Score);
-                    const team1Overs = parseFloat(match.team1Overs);
-                    const team2Overs = parseFloat(match.team2Overs);
-
-                    // Update runs scored/conceded and overs faced/bowled
-                    team1Stats.runsScored += team1Runs;
-                    team1Stats.oversFaced += team1Overs;
-                    team1Stats.runsConceded += team2Runs;
-                    team1Stats.oversBowled += team2Overs;
-
-                    team2Stats.runsScored += team2Runs;
-                    team2Stats.oversFaced += team2Overs;
-                    team2Stats.runsConceded += team1Runs;
-                    team2Stats.oversBowled += team1Overs;
-                }
-            });
-
-            // Calculate NRR for each team
-            standingsMap.forEach(team => {
-                let runRateFor = team.oversFaced > 0 ? team.runsScored / team.oversFaced : 0;
-                let runRateAgainst = team.oversBowled > 0 ? team.runsConceded / team.oversBowled : 0;
-                team.NRR = (runRateFor - runRateAgainst).toFixed(3); // Simplified NRR
-            });
-
-            // Convert map to array and sort
-            const sortedStandings = Array.from(standingsMap.values()).sort((a, b) => {
-                if (b.Pts !== a.Pts) {
-                    return b.Pts - a.Pts; // Sort by points (descending)
-                }
-                return parseFloat(b.NRR) - parseFloat(a.NRR); // Then by NRR (descending)
-            });
-
-            // Assign positions
-            return sortedStandings.map((team, index) => ({ ...team, Pos: index + 1 }));
-        }
-
+        });
     </script>
 </body>
 </html>
+
