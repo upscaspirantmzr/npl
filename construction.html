@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - NYF Tournament</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #48bb78;
+            --accent-yellow: #fbbf24;
+            --text-dark: #e2e8f0;
+            --text-light: #a0aec0;
+            --bg-light: #1a202c;
+            --bg-secondary: #2d3748;
+            --border-color: #4a5568;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        }
+        .container {
+            max-width: 700px;
+            z-index: 2;
+        }
+        .icon {
+            color: var(--primary-green);
+            width: 80px;
+            height: 80px;
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 0 0 1rem 0;
+            line-height: 1.2;
+        }
+        @media(min-width: 768px) {
+            h1 { font-size: 3.5rem; }
+        }
+        p {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            max-width: 500px;
+            margin: 0 auto 2.5rem auto;
+        }
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        .countdown-item {
+            background-color: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            width: 80px;
+        }
+        .countdown-item div:first-child {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .countdown-item div:last-child {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+        .home-link {
+            display: inline-block;
+            background-color: var(--accent-yellow);
+            color: #1a202c;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.3s ease;
+        }
+        .home-link:hover {
+            transform: scale(1.05);
+        }
+        .background-stadium {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, rgba(17, 24, 39, 0.5), transparent);
+            opacity: 0.3;
+            z-index: 1;
+        }
+         .background-stadium::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            width: 200%;
+            height: 200px;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.2) 0%, rgba(72, 187, 120, 0) 70%);
+            transform: translateX(-50%);
+            animation: spotlight 10s linear infinite alternate;
+         }
+         @keyframes spotlight {
+             0% { transform: translateX(-50%) scale(1); }
+             100% { transform: translateX(-50%) scale(1.5); }
+         }
+    </style>
+</head>
+<body>
+    <div class="background-stadium"></div>
+    <div class="container">
+        <!-- Cricket Bat and Ball Icon -->
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor">
+            <g transform="rotate(45 50 50)">
+                <path d="M68.2,41.3c-1.9-1.9-4.9-1.9-6.8,0L38.7,64c-1.9,1.9-1.9,4.9,0,6.8c1.9,1.9,4.9,1.9,6.8,0l22.7-22.7 C70.1,46.2,70.1,43.2,68.2,41.3z"/>
+                <path d="M36.6,62.7l-3.4,3.4c-1.9,1.9-1.9,4.9,0,6.8c1.9,1.9,4.9,1.9,6.8,0l3.4-3.4L36.6,62.7z"/>
+                <path d="M34.5,58.2L29,52.7c-0.6-0.6-0.9-1.3-0.9-2.1c0-0.8,0.3-1.5,0.9-2.1l7.5-7.5c1.2-1.2,3-1.2,4.2,0l4.5,4.5L34.5,58.2z"/>
+            </g>
+            <circle cx="30" cy="30" r="10"/>
+        </svg>
+
+        <h1>Preparing The Pitch!</h1>
+        <p>Our team is working hard behind the scenes on an exciting new feature. We'll be ready for the first ball soon!</p>
+        
+        <div id="countdown">
+            <div class="countdown-item">
+                <div id="days">00</div>
+                <div>Days</div>
+            </div>
+            <div class="countdown-item">
+                <div id="hours">00</div>
+                <div>Hours</div>
+            </div>
+            <div class="countdown-item">
+                <div id="minutes">00</div>
+                <div>Minutes</div>
+            </div>
+            <div class="countdown-item">
+                <div id="seconds">00</div>
+                <div>Seconds</div>
+            </div>
+        </div>
+        
+        <a href="index.html" class="home-link">Go to Homepage</a>
+    </div>
+
+    <script>
+        // Set the date we're counting down to (e.g., 7 days from now)
+        const countDownDate = new Date();
+        countDownDate.setDate(countDownDate.getDate() + 7);
+
+        const countdownFunction = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = String(days).padStart(2, '0');
+            document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+
+            if (distance < 0) {
+                clearInterval(countdownFunction);
+                document.getElementById("countdown").innerHTML = "<h2>Launched!</h2>";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
+
