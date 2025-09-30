@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Registration - NYF Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Styles (Dark Theme) */
+        :root {
+            --primary-purple: #9f7aea;
+            --primary-blue: #6366f1;
+            --accent-red: #f87171;
+            --accent-yellow: #fbbf24;
+            --text-dark: #e2e8f0;
+            --text-light: #a0aec0;
+            --bg-light: #1a202c;
+            --bg-secondary: #2d3748;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        @media (min-width: 640px) { .container { max-width: 640px; } }
+        @media (min-width: 768px) { .container { max-width: 768px; } }
+        @media (min-width: 1024px) { .container { max-width: 1024px; } }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .nav-brand {
+            font-size: 1.875rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .nav-links { display: none; }
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex; align-items: center;
+                gap: 1.5rem; font-size: 0.875rem;
+            }
+        }
+        .nav-links a { text-decoration: none; color: white; transition: color 0.3s ease; }
+        .nav-links a.active {
+            font-weight: 600;
+            border-bottom: 2px solid white;
+            padding-bottom: 0.25rem;
+        }
+        .nav-links a:not(.active):hover { color: var(--accent-yellow); }
+        .nav-links .admin-link {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem; border-radius: 0.375rem;
+        }
+        .nav-links .admin-link:hover { background-color: rgba(255, 255, 255, 0.3); }
+
+        /* Mobile Menu */
+        #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
+        @media (min-width: 768px) { #mobile-menu-button { display: none; } }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; }
+        #mobile-menu a { display: block; padding: 0.5rem 0; text-decoration: none; color: white; }
+        #mobile-menu a.admin-link { background-color: rgba(255, 255, 255, 0.2); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; }
+
+        /* Main Content & Form */
+        main { padding: 3rem 0; }
+        .form-container {
+            background-color: var(--bg-secondary);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 2rem; font-weight: 800;
+            text-align: center; margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+
+        /* Payment Section */
+        .payment-section {
+            text-align: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .payment-section h3 {
+            font-size: 1.5rem; font-weight: 700;
+            margin-top: 0; margin-bottom: 1rem;
+            color: var(--accent-yellow);
+        }
+        .payment-section p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .qr-code {
+            max-width: 200px;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 0 auto;
+        }
+        .qr-code img { max-width: 100%; display: block; }
+        
+        /* Form Fields */
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .form-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-group-full { grid-column: 1 / -1; }
+        }
+        .form-group label {
+            display: block; font-weight: 500;
+            margin-bottom: 0.5rem; color: var(--text-light);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.3);
+        }
+
+        /* File Input */
+        input[type="file"] {
+            padding: 0;
+        }
+        input[type="file"]::file-selector-button {
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-blue));
+            color: white; font-weight: 600;
+            padding: 0.75rem 1rem; margin-right: 1rem;
+            border: none; border-radius: 0.375rem 0 0 0.375rem;
+            cursor: pointer; transition: background-color 0.3s ease;
+        }
+         input[type="file"]::file-selector-button:hover {
+            opacity: 0.9;
+        }
+        
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            background: linear-gradient(to right, #f87171, #ef4444);
+            color: white; font-size: 1.125rem;
+            font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 10px 15px -3px rgba(248, 113, 113, 0.2);
+        }
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Message Box */
+        #message-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            display: none;
+        }
+        #message-box.success {
+            background-color: rgba(72, 187, 120, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        #message-box.error {
+            background-color: rgba(248, 113, 113, 0.2);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #111827; color: var(--text-light);
+            padding: 4rem 0; margin-top: 4rem;
+        }
+        .footer-content {
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center;
+        }
+        .footer-brand {
+            font-size: 1.875rem; font-weight: 700;
+            color: white; margin-bottom: 1rem;
+        }
+        .copyright {
+            margin-top: 2rem; font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem; width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="container nav">
+            <a href="index.html" class="nav-brand">NYF CRICKET</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="player-registration.html">Player Registration</a>
+                <a href="team-registration.html" class="active">Team Registration</a>
+                <a href="admin.html" class="admin-link">Admin Panel</a>
+            </div>
+            <button id="mobile-menu-button">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="player-registration.html">Player Registration</a>
+            <a href="team-registration.html">Team Registration</a>
+            <a href="admin.html" class="admin-link">Admin Panel</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="form-container">
+                <h2 class="section-title">Team Registration</h2>
+
+                <!-- Step 1: Payment -->
+                <div class="payment-section">
+                    <h3>Step 1: Complete Your Payment</h3>
+                    <p>Please pay the team registration fee by scanning the UPI QR code below. Take a screenshot of the successful payment to upload in the next step.</p>
+                    <div class="qr-code">
+                        <img src="media/qrcode.jpg" alt="UPI Payment QR Code" onerror="this.onerror=null;this.src='https://placehold.co/200x200?text=QR+Code';">
+                    </div>
+                </div>
+
+                <!-- Step 2: Form -->
+                <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 2rem;">Step 2: Fill Team Details</h3>
+                <form id="team-registration-form">
+                    <div class="form-grid">
+                        <div class="form-group form-group-full">
+                            <label for="teamName">Team Name</label>
+                            <input type="text" id="teamName" placeholder="e.g., The Champions" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="captainName">Captain's Name</label>
+                            <input type="text" id="captainName" placeholder="e.g., Jane Smith" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="captainPhone">Captain's Phone</label>
+                            <input type="tel" id="captainPhone" placeholder="e.g., 9876543210" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="captainEmail">Captain's Email</label>
+                            <input type="email" id="captainEmail" placeholder="e.g., jane.smith@example.com" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="city">City / Town</label>
+                            <input type="text" id="city" placeholder="e.g., New Delhi" required>
+                        </div>
+                         <div class="form-group form-group-full">
+                            <label for="paymentProof">Upload Payment Proof (Screenshot)</label>
+                            <input type="file" id="paymentProof" accept="image/*" required>
+                        </div>
+                        <div class="form-group-full">
+                            <button type="submit" class="submit-btn" id="submit-button">Submit Team Registration</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="message-box"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">NYF CRICKET</div>
+            <p>Experience the thrill of night cricket. Organized with passion.</p>
+            <div class="copyright">
+                &copy; 2025 NYF Cricket Tournament. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
+    
+    <script src="firebaseconfig.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        const form = document.getElementById('team-registration-form');
+        const submitButton = document.getElementById('submit-button');
+        const messageBox = document.getElementById('message-box');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const teamName = document.getElementById('teamName').value;
+            const captainName = document.getElementById('captainName').value;
+            const captainPhone = document.getElementById('captainPhone').value;
+            const captainEmail = document.getElementById('captainEmail').value;
+            const city = document.getElementById('city').value;
+            const paymentProofFile = document.getElementById('paymentProof').files[0];
+
+            if (!paymentProofFile) {
+                showMessage('Please upload a payment proof screenshot.', 'error');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+            
+            try {
+                // 1. Upload payment proof to Firebase Storage
+                const storageRef = ref(storage, `team_payment_proofs/${Date.now()}_${paymentProofFile.name}`);
+                const snapshot = await uploadBytes(storageRef, paymentProofFile);
+                
+                // 2. Get the download URL of the uploaded image
+                const proofUrl = await getDownloadURL(snapshot.ref);
+
+                // 3. Save team data to Firestore
+                await addDoc(collection(db, "teams"), {
+                    teamName,
+                    captainName,
+                    captainPhone,
+                    captainEmail,
+                    city,
+                    proofUrl,
+                    registeredAt: serverTimestamp()
+                });
+
+                showMessage('Team registration successful! We will get in touch with you shortly.', 'success');
+                form.reset();
+
+            } catch (error) {
+                console.error("Error submitting team registration: ", error);
+                showMessage('An error occurred. Please try again.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Team Registration';
+            }
+        });
+
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = type; // 'success' or 'error'
+            messageBox.style.display = 'block';
+
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+
