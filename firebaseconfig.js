@@ -1,10 +1,10 @@
-
 const firebaseConfig = {
-    apiKey: "AIzaSyB2xXyxbjPgNPs_nVtldHGGiYD1TKvY_Jw",
-  authDomain: "nyfcricket.firebaseapp.com",
-  projectId: "nyfcricket",
-  storageBucket: "nyfcricket.firebasestorage.app",
-  messagingSenderId: "9846999843",
-  appId: "1:9846999843:web:0397feb087e2dcd8c21a96",
-  measurementId: "G-50TCW6VTHL"
+  apiKey: "AIzaSyBSZksx94eCTBHC0XKwnq9ubZn9oKD4AGE",
+  authDomain: "aus-updates.firebaseapp.com",
+  databaseURL: "https://aus-updates-default-rtdb.firebaseio.com",
+  projectId: "aus-updates",
+  storageBucket: "aus-updates.appspot.com",
+  messagingSenderId: "1002850804557",
+  appId: "1:1002850804557:web:140825c35721d18e5e8d04",
+  measurementId: "G-QD9LDX9CTQ"
 };
