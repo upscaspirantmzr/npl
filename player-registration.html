@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* Base Styles (Dark Theme) */
         :root {
             --primary-purple: #9f7aea;
             --primary-blue: #6366f1;
@@ -37,15 +36,14 @@
             margin-right: auto;
             padding-left: 1.5rem;
             padding-right: 1.5rem;
+            box-sizing: border-box;
         }
-        @media (min-width: 640px) { .container { max-width: 640px; } }
-        @media (min-width: 768px) { .container { max-width: 768px; } }
         @media (min-width: 1024px) { .container { max-width: 1024px; } }
         
         /* Header */
         .header {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            color: white;
+            background-color: rgba(26, 32, 44, 0.8);
+            backdrop-filter: blur(10px);
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: sticky; top: 0; z-index: 50;
         }
@@ -66,75 +64,66 @@
                 gap: 1.5rem; font-size: 0.875rem;
             }
         }
-        .nav-links a { text-decoration: none; color: white; transition: color 0.3s ease; }
-        .nav-links a.active {
-            font-weight: 600;
-            border-bottom: 2px solid white;
-            padding-bottom: 0.25rem;
-        }
-        .nav-links a:not(.active):hover { color: var(--accent-yellow); }
+        .nav-links a { text-decoration: none; color: var(--text-light); transition: color 0.3s ease; }
+        .nav-links a.active { color: white; font-weight: 600; }
+        .nav-links a:not(.active):hover { color: white; }
         .nav-links .admin-link {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem; border-radius: 0.375rem;
+            background-color: var(--primary-blue);
+            padding: 0.5rem 1rem; border-radius: 0.375rem; color: white;
         }
-        .nav-links .admin-link:hover { background-color: rgba(255, 255, 255, 0.3); }
+        .nav-links .admin-link:hover { opacity: 0.9; }
 
         /* Mobile Menu */
         #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
         @media (min-width: 768px) { #mobile-menu-button { display: none; } }
-        #mobile-menu { display: none; padding: 0 1.5rem 1rem; }
-        #mobile-menu a { display: block; padding: 0.5rem 0; text-decoration: none; color: white; }
-        #mobile-menu a.admin-link { background-color: rgba(255, 255, 255, 0.2); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background-color: var(--bg-secondary); }
+        #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-light); }
+        #mobile-menu a.admin-link { background-color: var(--primary-blue); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; color: white; padding: 0.75rem;}
 
         /* Main Content & Form */
-        main { padding: 3rem 0; }
+        main { padding: 2rem 0; }
         .form-container {
             background-color: var(--bg-secondary);
-            padding: 2.5rem;
+            padding: 1.5rem;
             border-radius: 0.75rem;
             border: 1px solid var(--border-color);
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
         }
+        @media (min-width: 768px) { .form-container { padding: 2.5rem; } }
+
         .section-title {
-            font-size: 2rem; font-weight: 800;
+            font-size: 1.8rem; font-weight: 800;
             text-align: center; margin-bottom: 2rem;
             color: var(--text-dark);
         }
+        @media (min-width: 768px) { .section-title { font-size: 2rem; } }
 
         /* Payment Section */
         .payment-section {
             text-align: center;
             border: 2px dashed var(--border-color);
             border-radius: 0.5rem;
-            padding: 2rem;
-            margin-bottom: 2.5rem;
+            padding: 1.5rem; margin-bottom: 2.5rem;
         }
         .payment-section h3 {
-            font-size: 1.5rem; font-weight: 700;
-            margin-top: 0; margin-bottom: 1rem;
-            color: var(--accent-yellow);
+            font-size: 1.25rem; font-weight: 700;
+            margin-top: 0; margin-bottom: 1rem; color: var(--accent-yellow);
         }
+        @media (min-width: 768px) { .payment-section h3 { font-size: 1.5rem; } }
         .payment-section p {
             color: var(--text-light);
             margin-bottom: 1.5rem;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            max-width: 500px; margin-left: auto; margin-right: auto;
         }
         .qr-code {
-            max-width: 200px;
-            background-color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin: 0 auto;
+            max-width: 180px; background-color: white; padding: 1rem;
+            border-radius: 0.5rem; margin: 0 auto;
         }
-        .qr-code img { max-width: 100%; display: block; }
         
         /* Form Fields */
-        .form-grid {
-            display: grid;
-            gap: 1.5rem;
-        }
+        .form-grid { display: grid; gap: 1.5rem; }
         @media (min-width: 768px) {
             .form-grid { grid-template-columns: repeat(2, 1fr); }
             .form-group-full { grid-column: 1 / -1; }
@@ -144,95 +133,49 @@
             margin-bottom: 0.5rem; color: var(--text-light);
         }
         .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            width: 100%; padding: 0.75rem 1rem;
+            border-radius: 0.375rem; border: 1px solid var(--border-color);
+            background-color: var(--bg-light); color: var(--text-dark);
+            box-sizing: border-box; transition: all 0.3s ease;
         }
         .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-purple);
+            outline: none; border-color: var(--primary-purple);
             box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.3);
         }
 
         /* File Input */
-        input[type="file"] {
-            padding: 0;
-        }
         input[type="file"]::file-selector-button {
             background: linear-gradient(to right, var(--primary-purple), var(--primary-blue));
-            color: white; font-weight: 600;
-            padding: 0.75rem 1rem; margin-right: 1rem;
-            border: none; border-radius: 0.375rem 0 0 0.375rem;
-            cursor: pointer; transition: background-color 0.3s ease;
-        }
-         input[type="file"]::file-selector-button:hover {
-            opacity: 0.9;
+            color: white; font-weight: 600; padding: 0.75rem 1rem;
+            margin-right: 1rem; border: none;
+            border-radius: 0.375rem 0 0 0.375rem; cursor: pointer;
         }
         
         /* Submit Button */
         .submit-btn {
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 0.375rem;
-            background: linear-gradient(to right, #f87171, #ef4444);
-            color: white; font-size: 1.125rem;
-            font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            width: 100%; padding: 1rem; border: none; border-radius: 0.375rem;
+            background: linear-gradient(to right, var(--accent-red), #ef4444);
+            color: white; font-size: 1.125rem; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        .submit-btn:hover {
-            opacity: 0.9;
-            box-shadow: 0 10px 15px -3px rgba(248, 113, 113, 0.2);
-        }
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .submit-btn:hover { opacity: 0.9; box-shadow: 0 10px 15px -3px rgba(248, 113, 113, 0.2); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Message Box */
-        #message-box {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            text-align: center;
-            display: none;
-        }
-        #message-box.success {
-            background-color: rgba(72, 187, 120, 0.2);
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
-        #message-box.error {
-            background-color: rgba(248, 113, 113, 0.2);
-            color: var(--accent-red);
-            border: 1px solid var(--accent-red);
-        }
+        /* Success Message */
+        .success-message { text-align: center; padding: 2rem; }
+        .success-message h3 { font-size: 1.5rem; color: var(--success-color); }
+        .home-link { color: var(--accent-yellow); text-decoration: none; margin-top: 1rem; display: inline-block; }
 
         /* Footer */
         .footer {
             background-color: #111827; color: var(--text-light);
-            padding: 4rem 0; margin-top: 4rem;
-        }
-        .footer-content {
-            display: flex; flex-direction: column;
-            align-items: center; text-align: center;
-        }
-        .footer-brand {
-            font-size: 1.875rem; font-weight: 700;
-            color: white; margin-bottom: 1rem;
+            padding: 4rem 1.5rem; margin-top: 4rem; text-align: center;
         }
         .copyright {
             margin-top: 2rem; font-size: 0.875rem;
             border-top: 1px solid var(--border-color);
-            padding-top: 2rem; width: 100%;
+            padding-top: 2rem;
         }
-
     </style>
 </head>
 <body>
@@ -256,13 +199,13 @@
             <a href="index.html">Home</a>
             <a href="player-registration.html">Player Registration</a>
             <a href="team-registration.html">Team Registration</a>
-            <a href="admin.html" class="admin-link">Admin Panel</a>
+            
         </div>
     </header>
 
     <main>
         <div class="container">
-            <div class="form-container">
+            <div id="form-wrapper" class="form-container">
                 <h2 class="section-title">Player Registration</h2>
 
                 <!-- Step 1: Payment -->
@@ -294,10 +237,10 @@
                             <label for="age">Age</label>
                             <input type="number" id="age" placeholder="e.g., 25" required>
                         </div>
-                        <div class="form-group form-group-full">
-                            <label for="role">Playing Role</label>
+                         <div class="form-group form-group-full">
+                            <label for="role">Primary Playing Role</label>
                             <select id="role" required>
-                                <option value="" disabled selected>Select your primary role</option>
+                                <option value="" disabled selected>Select your role</option>
                                 <option value="Batsman">Batsman</option>
                                 <option value="Bowler">Bowler</option>
                                 <option value="All-Rounder">All-Rounder</option>
@@ -313,18 +256,13 @@
                         </div>
                     </div>
                 </form>
-                <div id="message-box"></div>
             </div>
         </div>
     </main>
 
     <footer class="footer">
-        <div class="container footer-content">
-            <div class="footer-brand">NYF CRICKET</div>
-            <p>Experience the thrill of night cricket. Organized with passion.</p>
-            <div class="copyright">
-                &copy; 2025 NYF Cricket Tournament. All Rights Reserved.
-            </div>
+        <div class="container">
+             <p>&copy; 2025 NYF Cricket Tournament. All Rights Reserved.</p>
         </div>
     </footer>
 
@@ -338,76 +276,63 @@
     <script src="firebaseconfig.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const form = document.getElementById('player-registration-form');
+        const registrationForm = document.getElementById('player-registration-form');
         const submitButton = document.getElementById('submit-button');
-        const messageBox = document.getElementById('message-box');
+        const formWrapper = document.getElementById('form-wrapper');
 
-        form.addEventListener('submit', async (e) => {
+        registrationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
             const fullName = document.getElementById('fullName').value;
             const phone = document.getElementById('phone').value;
             const email = document.getElementById('email').value;
             const age = document.getElementById('age').value;
             const role = document.getElementById('role').value;
-            const paymentProofFile = document.getElementById('paymentProof').files[0];
+            const proofFile = document.getElementById('paymentProof').files[0];
 
-            if (!paymentProofFile) {
-                showMessage('Please upload a payment proof screenshot.', 'error');
+            if (!proofFile) {
+                alert('Please upload a payment proof screenshot.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Registration';
                 return;
             }
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Submitting...';
-            
             try {
-                // 1. Upload payment proof to Firebase Storage
-                const storageRef = ref(storage, `payment_proofs/${Date.now()}_${paymentProofFile.name}`);
-                const snapshot = await uploadBytes(storageRef, paymentProofFile);
-                
-                // 2. Get the download URL of the uploaded image
+                // 1. Upload proof to Firebase Storage
+                const proofRef = ref(storage, `payment_proofs/${Date.now()}_${proofFile.name}`);
+                const snapshot = await uploadBytes(proofRef, proofFile);
                 const proofUrl = await getDownloadURL(snapshot.ref);
 
-                // 3. Save player data to Firestore
-                await addDoc(collection(db, "pending_players"), {
-                    fullName,
-                    phone,
-                    email,
-                    age: Number(age),
-                    role,
-                    proofUrl,
-                    status: 'pending',
-                    registeredAt: serverTimestamp()
+                // 2. Save player data to Firestore's "pending_players" collection
+                await addDoc(collection(db, 'pending_players'), {
+                    fullName, phone, email, age, role, proofUrl
                 });
 
-                showMessage('Registration successful! Your application is under review.', 'success');
-                form.reset();
+                // 3. Show success message
+                formWrapper.innerHTML = `
+                    <div class="success-message">
+                        <h3>Registration Submitted!</h3>
+                        <p>Your registration has been received and is pending approval. Thank you!</p>
+                        <a href="index.html" class="home-link">Back to Home</a>
+                    </div>
+                `;
 
             } catch (error) {
                 console.error("Error submitting registration: ", error);
-                showMessage('An error occurred. Please try again.', 'error');
-            } finally {
+                alert('An error occurred. Please check the console and try again.');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit Registration';
             }
         });
-
-        function showMessage(message, type) {
-            messageBox.textContent = message;
-            messageBox.className = type; // 'success' or 'error'
-            messageBox.style.display = 'block';
-
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 5000);
-        }
     </script>
 </body>
 </html>
