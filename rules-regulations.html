@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rules & Regulations - NYF Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-purple: #9f7aea;
+            --primary-blue: #6366f1;
+            --text-dark: #e2e8f0;
+            --text-light: #a0aec0;
+            --bg-light: #1a202c;
+            --bg-secondary: #2d3748;
+            --border-color: #4a5568;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            box-sizing: border-box;
+        }
+        @media (min-width: 1024px) { .container { max-width: 1024px; } }
+        
+       /* Header */
+        .header {
+            background-color: rgba(26, 32, 44, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .nav-brand {
+            font-size: 1.875rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .nav-links { display: none; }
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex; align-items: center;
+                gap: 1.5rem; font-size: 0.875rem;
+            }
+        }
+        .nav-links a { text-decoration: none; color: var(--text-light); transition: color 0.3s ease; }
+        .nav-links a.active { color: white; font-weight: 600; }
+        .nav-links a:not(.active):hover { color: white; }
+        .nav-links .admin-link {
+            background-color: var(--primary-blue);
+            padding: 0.5rem 1rem; border-radius: 0.375rem; color: white;
+        }
+        .nav-links .admin-link:hover { opacity: 0.9; }
+
+        /* Mobile Menu */
+        #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
+        @media (min-width: 768px) { #mobile-menu-button { display: none; } }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background-color: var(--bg-secondary); }
+        #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-light); }
+        #mobile-menu a.admin-link { background-color: var(--primary-blue); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; color: white; padding: 0.75rem;}
+
+        main { padding: 2rem 0; }
+        .page-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 2.5rem;
+            color: white;
+        }
+        @media(min-width: 768px) { .page-title { font-size: 3rem; }}
+
+        .rules-container {
+            background-color: var(--bg-secondary);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        @media(min-width: 768px) { .rules-container { padding: 2.5rem; }}
+
+        .rules-container h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .rules-container h2:first-of-type {
+            margin-top: 0;
+        }
+        
+        .rules-container ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+        .rules-container li {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        .rules-container p {
+            color: var(--text-light);
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #111827; color: var(--text-light);
+            padding: 4rem 1.5rem; margin-top: 4rem; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="container nav">
+            <a href="index.html" class="nav-brand">NYF CRICKET</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="fixtures.html">Fixtures</a>
+                <a href="rules.html" class="active">Rules</a>
+                <a href="player-registration.html">Player Registration</a>
+                <a href="team-registration.html">Team Registration</a>
+                <a href="admin.html" class="admin-link">Admin Panel</a>
+            </div>
+            <button id="mobile-menu-button">
+                 <!-- SVG Icon for mobile menu -->
+            </button>
+        </nav>
+        <div id="mobile-menu">
+             <!-- Mobile nav links -->
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="page-title">Rules & Regulations</h1>
+
+            <div class="rules-container">
+                <h2>1. General Conduct</h2>
+                <ul>
+                    <li>All players must adhere to the spirit of cricket.</li>
+                    <li>The umpire's decision is final and binding. Any dissent will result in disciplinary action.</li>
+                    <li>Teams must report to the ground at least 30 minutes before the scheduled start time.</li>
+                    <li>Players must wear appropriate cricketing attire.</li>
+                </ul>
+
+                <h2>2. Tournament Format</h2>
+                <p>The tournament will follow a round-robin league format, followed by knockout stages (Semi-Finals and Final).</p>
+                <ul>
+                    <li>Each match will be 10 overs per side.</li>
+                    <li>A win grants 2 points, a loss 0 points. In case of a tie, a Super Over will decide the winner.</li>
+                    <li>Top four teams from the league stage will qualify for the Semi-Finals.</li>
+                </ul>
+
+                <h2>3. Playing Rules</h2>
+                <ul>
+                    <li>A maximum of 3 overs can be bowled by a single bowler.</li>
+                    <li>Powerplay will be the first 3 overs, with only two fielders allowed outside the 30-yard circle.</li>
+                    <li>Free hits will be awarded for all no-balls (overstepping).</li>
+                    <li>In case of a rain interruption, the Duckworth-Lewis-Stern (DLS) method will be applied if a minimum of 5 overs have been completed in the second innings.</li>
+                </ul>
+                 <h2>4. Code of Conduct</h2>
+                <ul>
+                    <li>No abusive language or sledging will be tolerated.</li>
+                    <li>Damage to property or equipment will result in immediate disqualification and fines.</li>
+                    <li>Consumption of alcohol or illegal substances is strictly prohibited on the premises.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+             <p>&copy; 2025 NYF Cricket Tournament. All Rights Reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Basic mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>
