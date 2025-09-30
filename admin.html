@@ -40,6 +40,7 @@
             margin-left: auto;
             margin-right: auto;
             padding: 1.5rem;
+            box-sizing: border-box;
         }
         @media (min-width: 1024px) { .container { max-width: 1280px; } }
         
@@ -107,7 +108,12 @@
         }
         #logout-button:hover { background-color: #c53030; }
 
-        .tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+        .tabs { 
+            display: flex; 
+            border-bottom: 1px solid var(--border-color); 
+            overflow-x: auto; 
+            white-space: nowrap;
+        }
         .tab-button {
             padding: 1rem 1.5rem;
             cursor: pointer;
@@ -129,6 +135,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         .section-header h2 { margin: 0; }
         .pdf-btn {
@@ -182,6 +190,35 @@
         }
         
         .placeholder { color: var(--text-light); text-align: center; padding: 2rem; }
+
+        /* --- RESPONSIVE STYLES --- */
+        @media (max-width: 640px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .header h1 {
+                font-size: 1.25rem;
+            }
+            .tab-button {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pdf-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .login-box {
+                padding: 1.5rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
