@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Registration - NYF Tournament</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --primary-purple: #9f7aea;
+            --primary-blue: #6366f1;
+            --accent-red: #f87171;
+            --accent-yellow: #fbbf24;
+            --text-dark: #e2e8f0;
+            --text-light: #a0aec0;
+            --bg-light: #1a202c;
+            --bg-secondary: #2d3748;
+            --border-color: #4a5568;
+            --success-color: #48bb78;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            box-sizing: border-box;
+        }
+        @media (min-width: 1024px) { .container { max-width: 1024px; } }
+        
+        /* Header */
+        .header {
+            background-color: rgba(26, 32, 44, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 50;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .nav-brand {
+            font-size: 1.875rem; font-weight: 700;
+            text-decoration: none; color: white;
+        }
+        .nav-links { display: none; }
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex; align-items: center;
+                gap: 1.5rem; font-size: 0.875rem;
+            }
+        }
+        .nav-links a { text-decoration: none; color: var(--text-light); transition: color 0.3s ease; }
+        .nav-links a.active { color: white; font-weight: 600; }
+        .nav-links a:not(.active):hover { color: white; }
+        .nav-links .admin-link {
+            background-color: var(--primary-blue);
+            padding: 0.5rem 1rem; border-radius: 0.375rem; color: white;
+        }
+        .nav-links .admin-link:hover { opacity: 0.9; }
+
+        /* Mobile Menu */
+        #mobile-menu-button { display: block; background: none; border: none; color: white; cursor: pointer; }
+        @media (min-width: 768px) { #mobile-menu-button { display: none; } }
+        #mobile-menu { display: none; padding: 0 1.5rem 1rem; background-color: var(--bg-secondary); }
+        #mobile-menu a { display: block; padding: 0.75rem 0; text-decoration: none; color: var(--text-light); }
+        #mobile-menu a.admin-link { background-color: var(--primary-blue); border-radius: 0.375rem; text-align: center; margin-top: 0.5rem; color: white; padding: 0.75rem;}
+
+        /* Main Content & Form */
+        main { padding: 2rem 0; }
+        .form-container {
+            background-color: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) { .form-container { padding: 2.5rem; } }
+
+        .section-title {
+            font-size: 1.8rem; font-weight: 800;
+            text-align: center; margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+        @media (min-width: 768px) { .section-title { font-size: 2rem; } }
+
+        /* Payment Section */
+        .payment-section {
+            text-align: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem; margin-bottom: 2.5rem;
+        }
+        .payment-section h3 {
+            font-size: 1.25rem; font-weight: 700;
+            margin-top: 0; margin-bottom: 1rem; color: var(--accent-yellow);
+        }
+        @media (min-width: 768px) { .payment-section h3 { font-size: 1.5rem; } }
+        .payment-section p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            max-width: 500px; margin-left: auto; margin-right: auto;
+        }
+        .qr-code {
+            max-width: 180px; background-color: white; padding: 1rem;
+            border-radius: 0.5rem; margin: 0 auto;
+        }
+        
+        /* Form Fields */
+        .form-grid { display: grid; gap: 1.5rem; }
+        @media (min-width: 768px) {
+            .form-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-group-full { grid-column: 1 / -1; }
+        }
+        .form-group label {
+            display: block; font-weight: 500;
+            margin-bottom: 0.5rem; color: var(--text-light);
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.75rem 1rem;
+            border-radius: 0.375rem; border: 1px solid var(--border-color);
+            background-color: var(--bg-light); color: var(--text-dark);
+            box-sizing: border-box; transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.3);
+        }
+
+        /* File Input */
+        input[type="file"]::file-selector-button {
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-blue));
+            color: white; font-weight: 600; padding: 0.75rem 1rem;
+            margin-right: 1rem; border: none;
+            border-radius: 0.375rem 0 0 0.375rem; cursor: pointer;
+        }
+        
+        /* Submit Button */
+        .submit-btn {
+            width: 100%; padding: 1rem; border: none; border-radius: 0.375rem;
+            background: linear-gradient(to right, var(--accent-red), #ef4444);
+            color: white; font-size: 1.125rem; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .submit-btn:hover { opacity: 0.9; box-shadow: 0 10px 15px -3px rgba(248, 113, 113, 0.2); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Success Message */
+        .success-message { text-align: center; padding: 2rem; }
+        .success-message h3 { font-size: 1.5rem; color: var(--success-color); }
+        .success-message #download-pdf-btn { max-width: 300px; margin: 1rem auto 0; }
+        .home-link { color: var(--accent-yellow); text-decoration: none; margin-top: 1rem; display: inline-block; }
+
+        /* Footer */
+        .footer {
+            background-color: #111827; color: var(--text-light);
+            padding: 4rem 1.5rem; margin-top: 4rem; text-align: center;
+        }
+        .copyright {
+            margin-top: 2rem; font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="container nav">
+            <a href="index.html" class="nav-brand">NYF CRICKET</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="player-registration.html" class="active">Player Registration</a>
+                <a href="team-registration.html">Team Registration</a>
+                <a href="admin.html" class="admin-link">Admin Panel</a>
+            </div>
+            <button id="mobile-menu-button">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="player-registration.html">Player Registration</a>
+            <a href="team-registration.html">Team Registration</a>
+            
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="form-wrapper" class="form-container">
+                <h2 class="section-title">Player Registration</h2>
+
+                <!-- Step 1: Payment -->
+                <div class="payment-section">
+                    <h3>Step 1: Complete Your Payment</h3>
+                    <p>Please pay the registration fee by scanning the UPI QR code below. Take a screenshot of the successful payment to upload in the next step.</p>
+                    <div class="qr-code">
+                        <img src="media/qrcode.jpg" alt="UPI Payment QR Code" onerror="this.onerror=null;this.src='https://placehold.co/200x200?text=QR+Code';">
+                    </div>
+                </div>
+
+                <!-- Step 2: Form -->
+                <h3 style="text-align: center; font-size: 1.5rem; margin-bottom: 2rem;">Step 2: Fill Your Details</h3>
+                <form id="player-registration-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" placeholder="e.g., John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" placeholder="e.g., 9876543210" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="e.g., john.doe@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" placeholder="e.g., 25" required>
+                        </div>
+                         <div class="form-group form-group-full">
+                            <label for="role">Primary Playing Role</label>
+                            <select id="role" required>
+                                <option value="" disabled selected>Select your role</option>
+                                <option value="Batsman">Batsman</option>
+                                <option value="Bowler">Bowler</option>
+                                <option value="All-Rounder">All-Rounder</option>
+                                <option value="Wicket-Keeper">Wicket-Keeper</option>
+                            </select>
+                        </div>
+                         <div class="form-group form-group-full">
+                            <label for="paymentProof">Upload Payment Proof (Screenshot)</label>
+                            <input type="file" id="paymentProof" accept="image/*" required>
+                        </div>
+                        <div class="form-group-full">
+                            <button type="submit" class="submit-btn" id="submit-button">Submit Registration</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+             <p>&copy; 2025 NYF Cricket Tournament. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
+    
+    <script src="firebaseconfig.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        const registrationForm = document.getElementById('player-registration-form');
+        const submitButton = document.getElementById('submit-button');
+        const formWrapper = document.getElementById('form-wrapper');
+        const { jsPDF } = window.jspdf;
+
+        // --- PDF Generation Function ---
+        const generatePlayerPDF = (playerData) => {
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text("NYF Player Registration Application", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+
+            // Sub-header
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Registration Date: ${new Date().toLocaleDateString()}`, 15, 35);
+
+            // Player Details Table
+            doc.autoTable({
+                startY: 45,
+                head: [['Field', 'Information']],
+                body: [
+                    ['Full Name', playerData.fullName],
+                    ['Phone Number', playerData.phone],
+                    ['Email Address', playerData.email],
+                    ['Age', playerData.age],
+                    ['Primary Role', playerData.role]
+                ],
+                theme: 'grid',
+                styles: { fontSize: 12, cellPadding: 3 },
+                headStyles: { fillColor: [45, 55, 72] } // Dark blue-gray
+            });
+
+            const finalY = doc.autoTable.previous.finalY;
+
+            // Declaration
+            doc.setFontSize(10);
+            doc.text("Declaration:", 15, finalY + 20);
+            doc.setFont('helvetica', 'italic');
+            const declarationText = "I hereby declare that the information provided above is true to the best of my knowledge. I agree to abide by all the rules and regulations of the NYF Cricket Tournament.";
+            const splitText = doc.splitTextToSize(declarationText, 180);
+            doc.text(splitText, 15, finalY + 25);
+
+            // Signature Line
+            doc.setFont('helvetica', 'normal');
+            doc.line(140, finalY + 50, 195, finalY + 50); // Signature line
+            doc.text("Signature of Player", 145, finalY + 55);
+
+            // Save the PDF
+            doc.save(`${playerData.fullName}_NYF_Registration.pdf`);
+        };
+
+
+        // --- Form Submission Logic ---
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            const playerData = {
+                fullName: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                age: document.getElementById('age').value,
+                role: document.getElementById('role').value
+            };
+            const proofFile = document.getElementById('paymentProof').files[0];
+
+            if (!proofFile) {
+                alert('Please upload a payment proof screenshot.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Registration';
+                return;
+            }
+
+            try {
+                // 1. Upload proof to Firebase Storage
+                const proofRef = ref(storage, `payment_proofs/${Date.now()}_${proofFile.name}`);
+                const snapshot = await uploadBytes(proofRef, proofFile);
+                const proofUrl = await getDownloadURL(snapshot.ref);
+
+                // 2. Save player data to Firestore's "pending_players" collection
+                await addDoc(collection(db, 'pending_players'), { ...playerData, proofUrl });
+
+                // 3. Show success message and offer PDF download
+                formWrapper.innerHTML = `
+                    <div class="success-message">
+                        <h3>Registration Submitted!</h3>
+                        <p>Your registration is pending approval. You can download a copy of your application below.</p>
+                        <button id="download-pdf-btn" class="submit-btn">Download Application PDF</button>
+                        <a href="index.html" class="home-link">Back to Home</a>
+                    </div>
+                `;
+
+                // 4. Immediately trigger the PDF download
+                generatePlayerPDF(playerData);
+                
+                // 5. Add event listener to the new button for re-downloading
+                document.getElementById('download-pdf-btn').addEventListener('click', () => {
+                    generatePlayerPDF(playerData);
+                });
+
+            } catch (error) {
+                console.error("Error submitting registration: ", error);
+                alert('An error occurred. Please check the console and try again.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Registration';
+            }
+        });
+    </script>
+</body>
+</html>
+
