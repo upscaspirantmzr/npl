@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaSoft - Offline Pharmacy Billing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 50;
+        }
+        .modal-content {
+            transform: translateY(-50px);
+            transition: transform 0.3s ease-out;
+        }
+        .modal-backdrop.flex {
+            display: flex;
+        }
+        .modal-backdrop.flex .modal-content {
+            transform: translateY(0);
+        }
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Main Container -->
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+
+        <header class="mb-6 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold text-blue-600 mb-2 sm:mb-0">PharmaSoft</h1>
+            <div class="text-sm text-gray-500">
+                <span id="current-date-time"></span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="mb-6 border-b border-gray-200 no-print">
+            <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+                <button onclick="switchTab('billing')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-active">Billing</button>
+                <button onclick="switchTab('inventory')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Inventory</button>
+                <button onclick="switchTab('reports')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Sales Reports</button>
+            </nav>
+        </div>
+
+        <!-- Content Area -->
+        <main>
+            <!-- Billing Section -->
+            <div id="billing" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Side: Invoice -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h2 class="text-xl font-semibold">New Invoice</h2>
+                                <p class="text-sm text-gray-500">Invoice ID: <span id="invoice-id" class="font-mono"></span></p>
+                            </div>
+                            <input type="text" id="customer-name" placeholder="Customer Name (Optional)" class="w-1/3 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        </div>
+                        
+                        <!-- Search and Add Product -->
+                        <div class="relative mb-4">
+                            <input type="text" id="product-search" placeholder="Search for products by name..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <svg class="w-5 h-5 text-gray-400 absolute top-3.5 left-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <div id="search-results" class="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto hidden"></div>
+                        </div>
+
+                        <!-- Invoice Items Table -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Quantity</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Total</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoice-items" class="bg-white divide-y divide-gray-200">
+                                    <!-- Items will be injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="empty-cart-message" class="text-center text-gray-500 py-8">Your cart is empty. Search for products to add them.</p>
+
+                    </div>
+                    <!-- Right Side: Summary & Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-md h-fit">
+                        <h3 class="text-lg font-semibold border-b pb-3 mb-4">Invoice Summary</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+                            <div class="flex justify-between"><span>GST (5%)</span><span id="gst">₹0.00</span></div>
+                            <div class="flex justify-between font-bold text-lg border-t pt-3"><span>Grand Total</span><span id="grand-total">₹0.00</span></div>
+                        </div>
+                        <div class="mt-6 space-y-3">
+                            <button onclick="App.saveAndPrintBill()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm">Save & Print</button>
+                            <button onclick="App.saveBill()" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-sm">Save Bill</button>
+                            <button onclick="App.clearBill()" class="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Section -->
+            <div id="inventory" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">Inventory Management</h2>
+                        <button onclick="App.showProductModal()" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm">Add New Product</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-list" class="bg-white divide-y divide-gray-200">
+                                <!-- Inventory items will be injected here -->
+                            </tbody>
+                        </table>
+                        <p id="empty-inventory-message" class="text-center text-gray-500 py-8 hidden">No products found. Add a new product to get started.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Reports Section -->
+            <div id="reports" class="tab-content hidden">
+                 <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">Sales Reports</h2>
+                        <div class="flex items-center space-x-2">
+                             <input type="date" id="report-date-filter" class="p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                             <button onclick="App.clearDateFilter()" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-300">Clear</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-list" class="bg-white divide-y divide-gray-200">
+                                <!-- Reports will be injected here -->
+                            </tbody>
+                        </table>
+                        <p id="empty-reports-message" class="text-center text-gray-500 py-8 hidden">No sales records found.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal-backdrop items-center justify-center">
+        <div class="modal-content bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <h2 id="modal-title" class="text-xl font-semibold mb-6">Add New Product</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="product-name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                        <input type="text" id="product-name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="product-price" class="block text-sm font-medium text-gray-700">Price (₹)</label>
+                        <input type="number" id="product-price" min="0" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="product-stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+                        <input type="number" id="product-stock" min="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="product-expiry" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                        <input type="date" id="product-expiry" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="App.hideProductModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">Cancel</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="modal-backdrop items-center justify-center">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+            <p id="alert-message" class="text-gray-800 mb-4"></p>
+            <button onclick="App.hideAlert()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">OK</button>
+        </div>
+    </div>
+    
+    <!-- Printable Invoice Area -->
+    <div id="print-area" class="p-8 bg-white"></div>
+
+
+    <script>
+        // --- Tab Switching UI ---
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        function switchTab(tabName) {
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabName)) {
+                    tab.classList.add('tab-active');
+                } else {
+                    tab.classList.remove('tab-active');
+                }
+            });
+            contents.forEach(content => {
+                if (content.id === tabName) {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- Main Application Logic ---
+        const App = {
+            // --- State ---
+            state: {
+                products: [],
+                sales: [],
+                currentBill: {
+                    items: [],
+                    customerName: '',
+                    subtotal: 0,
+                    gst: 0,
+                    total: 0,
+                },
+                fuse: null,
+            },
+
+            // --- Initialization ---
+            init() {
+                // Load data from localStorage
+                this.state.products = JSON.parse(localStorage.getItem('products')) || [];
+                this.state.sales = JSON.parse(localStorage.getItem('sales')) || [];
+
+                // Initialize Fuse.js for fuzzy search
+                this.initFuse();
+
+                // Set up event listeners
+                this.bindEvents();
+
+                // Initial render
+                this.renderInventory();
+                this.renderReports();
+                this.prepareNewBill();
+                this.updateDateTime();
+                setInterval(this.updateDateTime, 1000);
+                
+                // Add some dummy data if the store is empty
+                if(this.state.products.length === 0) {
+                    this.addDummyData();
+                }
+            },
+            
+            addDummyData() {
+                const dummyProducts = [
+                    { id: Date.now() + 1, name: 'Paracetamol 500mg', price: 25.50, stock: 100, expiry: '2026-12-31' },
+                    { id: Date.now() + 2, name: 'Aspirin 75mg', price: 15.00, stock: 150, expiry: '2025-10-31' },
+                    { id: Date.now() + 3, name: 'Cetirizine 10mg', price: 30.75, stock: 80, expiry: '2026-08-31' },
+                    { id: Date.now() + 4, name: 'Band-Aid (Pack of 20)', price: 50.00, stock: 200, expiry: '2027-01-31' },
+                    { id: Date.now() + 5, name: 'Antiseptic Liquid 100ml', price: 85.25, stock: 60, expiry: '2025-05-31' },
+                ];
+                this.state.products = dummyProducts;
+                this.saveProducts();
+                this.renderInventory();
+                this.initFuse();
+            },
+
+            initFuse() {
+                const options = {
+                    keys: ['name'],
+                    includeScore: true,
+                    threshold: 0.4,
+                };
+                this.state.fuse = new Fuse(this.state.products, options);
+            },
+            
+            updateDateTime() {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                document.getElementById('current-date-time').textContent = now.toLocaleDateString('en-IN', options);
+            },
+
+            // --- Event Binding ---
+            bindEvents() {
+                document.getElementById('product-form').addEventListener('submit', this.handleProductFormSubmit.bind(this));
+                document.getElementById('product-search').addEventListener('input', this.handleProductSearch.bind(this));
+                document.getElementById('report-date-filter').addEventListener('change', () => this.renderReports());
+            },
+
+            // --- Data Persistence ---
+            saveProducts() {
+                localStorage.setItem('products', JSON.stringify(this.state.products));
+                this.initFuse(); // Re-initialize search index
+            },
+            saveSales() {
+                localStorage.setItem('sales', JSON.stringify(this.state.sales));
+            },
+
+            // --- UI Rendering ---
+            renderInventory() {
+                const inventoryList = document.getElementById('inventory-list');
+                const emptyMsg = document.getElementById('empty-inventory-message');
+                inventoryList.innerHTML = '';
+                if (this.state.products.length === 0) {
+                    emptyMsg.classList.remove('hidden');
+                    return;
+                }
+                emptyMsg.classList.add('hidden');
+                
+                // Sort products by name
+                const sortedProducts = [...this.state.products].sort((a, b) => a.name.localeCompare(b.name));
+
+                sortedProducts.forEach(product => {
+                    const expiryDate = new Date(product.expiry);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const isExpired = product.expiry && expiryDate < today;
+
+                    const row = document.createElement('tr');
+                    row.className = isExpired ? 'bg-red-50' : (product.stock < 10 ? 'bg-yellow-50' : '');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                            ${isExpired ? `<div class="text-xs text-red-600">Expired</div>` : ''}
+                            ${product.stock < 10 ? `<div class="text-xs text-yellow-600">Low Stock</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">₹${parseFloat(product.price).toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${product.stock < 10 ? 'font-bold text-yellow-700' : 'text-gray-700'}">${product.stock}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${isExpired ? 'font-bold text-red-700' : 'text-gray-700'}">${product.expiry || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="App.editProduct(${product.id})" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                            <button onclick="App.deleteProduct(${product.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                        </td>
+                    `;
+                    inventoryList.appendChild(row);
+                });
+            },
+
+            renderReports() {
+                const reportsList = document.getElementById('reports-list');
+                const emptyMsg = document.getElementById('empty-reports-message');
+                const dateFilter = document.getElementById('report-date-filter').value;
+                reportsList.innerHTML = '';
+                
+                let filteredSales = this.state.sales;
+                if(dateFilter) {
+                    filteredSales = this.state.sales.filter(sale => sale.date.startsWith(dateFilter));
+                }
+
+                if (filteredSales.length === 0) {
+                    emptyMsg.classList.remove('hidden');
+                    return;
+                }
+                emptyMsg.classList.add('hidden');
+
+                // Sort sales by date descending
+                const sortedSales = [...filteredSales].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                sortedSales.forEach(sale => {
+                    const row = document.createElement('tr');
+                    const saleDate = new Date(sale.date);
+                    const formattedDate = saleDate.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-700">${sale.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${formattedDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${sale.customerName || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${sale.items.length}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹${sale.total.toFixed(2)}</td>
+                    `;
+                    reportsList.appendChild(row);
+                });
+            },
+            
+            clearDateFilter() {
+                 document.getElementById('report-date-filter').value = '';
+                 this.renderReports();
+            },
+
+            renderCurrentBill() {
+                const billItems = document.getElementById('invoice-items');
+                const emptyMsg = document.getElementById('empty-cart-message');
+                billItems.innerHTML = '';
+
+                if (this.state.currentBill.items.length === 0) {
+                    emptyMsg.classList.remove('hidden');
+                    billItems.classList.add('hidden');
+                } else {
+                    emptyMsg.classList.add('hidden');
+                    billItems.classList.remove('hidden');
+                }
+
+                this.state.currentBill.items.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">₹${item.price.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <input type="number" value="${item.quantity}" min="1" max="${item.maxQuantity}" onchange="App.updateBillItemQuantity(${item.id}, this.value)" class="w-20 p-1 border border-gray-300 rounded-md">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹${(item.price * item.quantity).toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <button onclick="App.removeBillItem(${item.id})" class="text-red-500 hover:text-red-700 p-1 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg></button>
+                        </td>
+                    `;
+                    billItems.appendChild(row);
+                });
+                this.calculateTotals();
+            },
+            
+            calculateTotals() {
+                const subtotal = this.state.currentBill.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                const gst = subtotal * 0.05;
+                const total = subtotal + gst;
+
+                this.state.currentBill.subtotal = subtotal;
+                this.state.currentBill.gst = gst;
+                this.state.currentBill.total = total;
+
+                document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+                document.getElementById('gst').textContent = `₹${gst.toFixed(2)}`;
+                document.getElementById('grand-total').textContent = `₹${total.toFixed(2)}`;
+            },
+
+            // --- Product Management ---
+            handleProductFormSubmit(e) {
+                e.preventDefault();
+                const id = document.getElementById('product-id').value;
+                const product = {
+                    name: document.getElementById('product-name').value,
+                    price: parseFloat(document.getElementById('product-price').value),
+                    stock: parseInt(document.getElementById('product-stock').value),
+                    expiry: document.getElementById('product-expiry').value
+                };
+
+                if (id) { // Editing existing product
+                    const index = this.state.products.findIndex(p => p.id == id);
+                    this.state.products[index] = { ...this.state.products[index], ...product };
+                } else { // Adding new product
+                    product.id = Date.now();
+                    this.state.products.push(product);
+                }
+
+                this.saveProducts();
+                this.renderInventory();
+                this.hideProductModal();
+            },
+
+            editProduct(id) {
+                const product = this.state.products.find(p => p.id === id);
+                if (product) {
+                    document.getElementById('modal-title').textContent = 'Edit Product';
+                    document.getElementById('product-id').value = product.id;
+                    document.getElementById('product-name').value = product.name;
+                    document.getElementById('product-price').value = product.price;
+                    document.getElementById('product-stock').value = product.stock;
+                    document.getElementById('product-expiry').value = product.expiry;
+                    this.showProductModal();
+                }
+            },
+            
+            deleteProduct(id) {
+                if (confirm('Are you sure you want to delete this product?')) {
+                    this.state.products = this.state.products.filter(p => p.id !== id);
+                    this.saveProducts();
+                    this.renderInventory();
+                }
+            },
+
+            // --- Billing ---
+            handleProductSearch(e) {
+                const query = e.target.value;
+                const searchResultsEl = document.getElementById('search-results');
+                searchResultsEl.innerHTML = '';
+
+                if (query.length < 1) {
+                    searchResultsEl.classList.add('hidden');
+                    return;
+                }
+
+                const results = this.state.fuse.search(query);
+                searchResultsEl.classList.remove('hidden');
+
+                if (results.length === 0) {
+                    searchResultsEl.innerHTML = `<div class="p-3 text-gray-500">No results found</div>`;
+                } else {
+                    results.slice(0, 10).forEach(result => {
+                        const product = result.item;
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'p-3 hover:bg-blue-50 cursor-pointer border-b';
+                        itemEl.innerHTML = `
+                            <div class="font-medium">${product.name}</div>
+                            <div class="text-sm text-gray-500">Stock: ${product.stock} | Price: ₹${product.price.toFixed(2)}</div>
+                        `;
+                        itemEl.onclick = () => this.addProductToBill(product.id);
+                        searchResultsEl.appendChild(itemEl);
+                    });
+                }
+            },
+            
+            addProductToBill(productId) {
+                document.getElementById('product-search').value = '';
+                document.getElementById('search-results').classList.add('hidden');
+
+                const product = this.state.products.find(p => p.id === productId);
+
+                // Check if already in bill
+                const existingItem = this.state.currentBill.items.find(item => item.id === productId);
+                if(existingItem) {
+                    if (existingItem.quantity < product.stock) {
+                         this.updateBillItemQuantity(productId, existingItem.quantity + 1);
+                    } else {
+                         this.showAlert(`Cannot add more of ${product.name}. Stock limit reached.`);
+                    }
+                    return;
+                }
+
+                if (product && product.stock > 0) {
+                    this.state.currentBill.items.push({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1,
+                        maxQuantity: product.stock
+                    });
+                    this.renderCurrentBill();
+                } else {
+                    this.showAlert('Product is out of stock.');
+                }
+            },
+
+            updateBillItemQuantity(productId, newQuantity) {
+                const item = this.state.currentBill.items.find(item => item.id === productId);
+                const product = this.state.products.find(p => p.id === productId);
+                newQuantity = parseInt(newQuantity);
+
+                if (item && newQuantity > 0) {
+                    if (newQuantity > product.stock) {
+                        this.showAlert(`Only ${product.stock} units of ${product.name} available.`);
+                        item.quantity = product.stock;
+                    } else {
+                        item.quantity = newQuantity;
+                    }
+                    this.renderCurrentBill();
+                }
+            },
+
+            removeBillItem(productId) {
+                this.state.currentBill.items = this.state.currentBill.items.filter(item => item.id !== productId);
+                this.renderCurrentBill();
+            },
+            
+            prepareNewBill() {
+                document.getElementById('invoice-id').textContent = `INV-${Date.now()}`;
+                document.getElementById('customer-name').value = '';
+                this.state.currentBill = {
+                    items: [],
+                    customerName: '',
+                    subtotal: 0,
+                    gst: 0,
+                    total: 0,
+                };
+                this.renderCurrentBill();
+            },
+            
+            clearBill() {
+                 if (confirm('Are you sure you want to clear the current bill?')) {
+                    this.prepareNewBill();
+                }
+            },
+
+            saveBill(andPrint = false) {
+                if (this.state.currentBill.items.length === 0) {
+                    this.showAlert("Cannot save an empty bill.");
+                    return;
+                }
+                
+                // 1. Create Sale Object
+                const newSale = {
+                    id: document.getElementById('invoice-id').textContent,
+                    date: new Date().toISOString(),
+                    customerName: document.getElementById('customer-name').value.trim(),
+                    items: this.state.currentBill.items,
+                    subtotal: this.state.currentBill.subtotal,
+                    gst: this.state.currentBill.gst,
+                    total: this.state.currentBill.total
+                };
+                
+                // 2. Update Stock
+                newSale.items.forEach(item => {
+                    const product = this.state.products.find(p => p.id === item.id);
+                    if (product) {
+                        product.stock -= item.quantity;
+                    }
+                });
+                
+                // 3. Save Data
+                this.state.sales.push(newSale);
+                this.saveSales();
+                this.saveProducts();
+                
+                // 4. Update UI
+                this.showAlert(`Bill ${newSale.id} saved successfully!`);
+                this.renderInventory();
+                this.renderReports();
+                
+                if (andPrint) {
+                    this.printBill(newSale);
+                }
+                
+                this.prepareNewBill();
+            },
+            
+            saveAndPrintBill() {
+                this.saveBill(true);
+            },
+
+            printBill(sale) {
+                const printArea = document.getElementById('print-area');
+                const printDate = new Date(sale.date).toLocaleString('en-IN');
+                
+                let itemsHtml = sale.items.map(item => `
+                    <tr>
+                        <td class="py-2 px-4">${item.name}</td>
+                        <td class="py-2 px-4 text-right">${item.quantity}</td>
+                        <td class="py-2 px-4 text-right">₹${item.price.toFixed(2)}</td>
+                        <td class="py-2 px-4 text-right">₹${(item.quantity * item.price).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                printArea.innerHTML = `
+                    <div class="max-w-2xl mx-auto p-4 border rounded">
+                        <div class="text-center mb-6">
+                            <h1 class="text-2xl font-bold">Tax Invoice</h1>
+                            <p class="text-gray-600">PharmaSoft Pharmacy</p>
+                        </div>
+                        <div class="flex justify-between mb-4 text-sm">
+                            <div>
+                                <p><strong>Invoice ID:</strong> ${sale.id}</p>
+                                <p><strong>Date:</strong> ${printDate}</p>
+                            </div>
+                            <div>
+                                <p><strong>To:</strong> ${sale.customerName || 'Walk-in Customer'}</p>
+                            </div>
+                        </div>
+                        <table class="w-full text-sm border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-2 px-4 text-left font-semibold">Item</th>
+                                    <th class="py-2 px-4 text-right font-semibold">Qty</th>
+                                    <th class="py-2 px-4 text-right font-semibold">Rate</th>
+                                    <th class="py-2 px-4 text-right font-semibold">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>${itemsHtml}</tbody>
+                            <tfoot>
+                                <tr class="border-t-2 border-gray-300">
+                                    <td colspan="3" class="py-1 px-4 text-right">Subtotal</td>
+                                    <td class="py-1 px-4 text-right">₹${sale.subtotal.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="py-1 px-4 text-right">GST (5%)</td>
+                                    <td class="py-1 px-4 text-right">₹${sale.gst.toFixed(2)}</td>
+                                </tr>
+                                <tr class="font-bold text-base bg-gray-100">
+                                    <td colspan="3" class="py-2 px-4 text-right">Grand Total</td>
+                                    <td class="py-2 px-4 text-right">₹${sale.total.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="text-center mt-6 text-xs text-gray-500">
+                            <p>Thank you for your purchase!
+                        </p>
+                        <p>Developed by Aminul</p>
+                        </div>
+                    </div>
+                `;
+                window.print();
+            },
+
+            // --- Modal Controls ---
+            showProductModal() {
+                document.getElementById('product-modal').classList.add('flex');
+            },
+            hideProductModal() {
+                document.getElementById('product-modal').classList.remove('flex');
+                document.getElementById('product-form').reset();
+                document.getElementById('product-id').value = '';
+                document.getElementById('modal-title').textContent = 'Add New Product';
+            },
+            showAlert(message) {
+                document.getElementById('alert-message').textContent = message;
+                document.getElementById('alert-modal').classList.add('flex');
+            },
+            hideAlert() {
+                document.getElementById('alert-modal').classList.remove('flex');
+            },
+        };
+
+        // --- Initialize App on DOM Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+        });
+    </script>
+
+</body>
+</html>
